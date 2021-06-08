@@ -854,3 +854,68 @@ class JPBEcDFTStaticFW(Firework):
         t.append(VaspToDb(db_file=db_file, bandstructure_mode="uniform",
                           parse_dos=True, parse_eigenvalues=True, **vasptodb_kwargs))
         super(JPBEcDFTStaticFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
+
+class HSEBSFW(Firework):
+    def __init__(
+            self,
+            parents=None,
+            prev_calc_dir=None,
+            cp_file_from_prev="CHGCAR",
+            structure=None,
+            mode="gap",
+            name=None,
+            input_set_overrides=None,
+            vasp_cmd=VASP_CMD,
+            db_file=DB_FILE,
+            **kwargs
+    ):
+        """
+        For getting a more accurate band gap or a full band structure with HSE - requires previous
+        calculation that gives VBM/CBM info or the high-symmetry kpoints.
+
+        Args:
+            parents (Firework): Parents of this particular Firework. FW or list of FWS.
+            prev_calc_dir (str): Path to a previous calculation to copy from
+            structure (Structure): Input structure - used only to set the name of the FW.
+            mode (string): options:
+                "line" to get a full band structure along symmetry lines or
+                "uniform" for uniform mesh band structure or
+                "gap" to get the energy at the CBM and VBM
+            name (str): Name for the Firework.
+            vasp_cmd (str): Command to run vasp.
+            db_file (str): Path to file specifying db credentials.
+            \*\*kwargs: Other kwargs that are passed to Firework.__init__.
+        """
+        name = name if name else "{} {}".format("hse", mode)
+
+        fw_name = "{}-{}".format(
+            structure.composition.reduced_formula if structure else "unknown", name
+        )
+
+        t = []
+        if prev_calc_dir:
+            t.append(
+                CopyVaspOutputs(calc_dir=prev_calc_dir, additional_files=[cp_file_from_prev])
+            )
+        elif parents:
+            t.append(CopyVaspOutputs(calc_loc=True, additional_files=[cp_file_from_prev]))
+        else:
+            raise ValueError("Must specify a previous calculation for HSEBSFW")
+
+        t.append(WriteVaspHSEBSFromPrev(prev_calc_dir=".", mode=mode, **input_set_overrides))
+        t.append(RunVaspCustodian(vasp_cmd=vasp_cmd))
+        t.append(PassCalcLocs(name=name))
+
+        parse_dos = True if mode == "uniform" else False
+        bandstructure_mode = mode if mode in ["line", "uniform"] else "line"
+
+        t.append(
+            VaspToDb(
+                db_file=db_file,
+                additional_fields={"task_label": name},
+                parse_dos=parse_dos,
+                bandstructure_mode=bandstructure_mode
+            )
+        )
+        super(HSEBSFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
+
