@@ -335,3 +335,75 @@ class JWriteInputsFromDB(FiretaskBase):
         if self.get("write_chgcar"):
             chgcar = db.get_chgcar(self["task_id"])
             chgcar.write_file(os.path.join(pth, "CHGCAR"))
+
+@explicit_serialize
+class WriteTwoDBSKpoints(FiretaskBase):
+    optional_params = ["added_kpoints", "reciprocal_density", "kpoints_line_density", "mode"]
+    def run_task(self, fw_spec):
+                 #structure, added_kpoints=None, reciprocal_density=50, kpoints_line_density=20, mode="line")
+        structure = None
+        try:
+            structure = Structure.from_file("POSCAR")
+        except Exception:
+            structure = Structure.from_file("POSCAR.gz")
+
+        added_kpoints = self.get("added_kpoints", [])
+        reciprocal_density = self.get("reciprocal_density", 50)
+        kpoints_line_density = self.get("kpoints_line_density", 20)
+        mode = self.get("mode", "line")
+
+        kpts = []
+        weights = []
+        all_labels = []
+
+        # for both modes, include the Uniform mesh w/standard weights
+        grid = Kpoints.automatic_density_by_vol(structure, reciprocal_density).kpts
+        ir_kpts = SpacegroupAnalyzer(structure, symprec=0.1).get_ir_reciprocal_mesh(
+            grid[0]
+        )
+        for k in ir_kpts:
+            if round(k[0][2], 1) != 0:
+                continue
+            kpts.append(k[0])
+            weights.append(int(k[1]))
+            all_labels.append(None)
+
+        # for both modes, include any user-added kpoints w/zero weight
+        for k in added_kpoints:
+            kpts.append(k)
+            weights.append(0.0)
+            all_labels.append("user-defined")
+
+        # for line mode only, add the symmetry lines w/zero weight
+        if mode.lower() == "line":
+            kpath = HighSymmKpath(structure)
+            frac_k_points, labels = kpath.get_kpoints(
+                line_density=kpoints_line_density, coords_are_cartesian=False
+            )
+
+            two_d_kpt, two_d_kpt_label = [], []
+            for kpt, klabel in zip(frac_k_points, labels):
+                if round(kpt[2], 1) == 0:
+                    two_d_kpt.append(kpt)
+                    two_d_kpt_label.append(klabel)
+            frac_k_points, labels = two_d_kpt, two_d_kpt_label
+
+            for k, f in enumerate(frac_k_points):
+                kpts.append(f)
+                weights.append(0.0)
+                all_labels.append(labels[k])
+
+        comment = (
+            "HSE run along symmetry lines"
+            if mode.lower() == "line"
+            else "HSE run on uniform grid"
+        )
+
+        Kpoints(
+            comment=comment,
+            style=Kpoints.supported_modes.Reciprocal,
+            num_kpts=len(kpts),
+            kpts=kpts,
+            kpts_weights=weights,
+            labels=all_labels,
+        ).write_file("KPOINTS")

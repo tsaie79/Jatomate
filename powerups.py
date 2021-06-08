@@ -1,3 +1,5 @@
+from my_atomate.firetasks.firetasks import WriteTwoDBSKpoints
+
 from atomate.common.firetasks.glue_tasks import DeleteFiles
 from atomate.utils.utils import get_meta_from_structure, get_fws_and_tasks
 from atomate.vasp.config import (
@@ -253,84 +255,9 @@ def add_modify_twod_bs_kpoints(
     Returns:
        Workflow
     """
-    def twod_bs_kpoints(structure, added_kpoints=None, reciprocal_density=50, kpoints_line_density=20, mode="line"):
-        """
-        :return: Kpoints
-        """
-        added_kpoints = added_kpoints if added_kpoints is not None else []
-        kpts = []
-        weights = []
-        all_labels = []
-
-        # for both modes, include the Uniform mesh w/standard weights
-        grid = Kpoints.automatic_density_by_vol(structure, reciprocal_density).kpts
-        ir_kpts = SpacegroupAnalyzer(structure, symprec=0.1).get_ir_reciprocal_mesh(
-            grid[0]
-        )
-        for k in ir_kpts:
-            if round(k[0][2], 1) != 0:
-                continue
-            kpts.append(k[0])
-            weights.append(int(k[1]))
-            all_labels.append(None)
-
-        # for both modes, include any user-added kpoints w/zero weight
-        for k in added_kpoints:
-            kpts.append(k)
-            weights.append(0.0)
-            all_labels.append("user-defined")
-
-        # for line mode only, add the symmetry lines w/zero weight
-        if mode.lower() == "line":
-            kpath = HighSymmKpath(structure)
-            frac_k_points, labels = kpath.get_kpoints(
-                line_density=kpoints_line_density, coords_are_cartesian=False
-            )
-
-            two_d_kpt, two_d_kpt_label = [], []
-            for kpt, klabel in zip(frac_k_points, labels):
-                if round(kpt[2], 1) == 0:
-                    two_d_kpt.append(kpt)
-                    two_d_kpt_label.append(klabel)
-            frac_k_points, labels = two_d_kpt, two_d_kpt_label
-
-            for k, f in enumerate(frac_k_points):
-                kpts.append(f)
-                weights.append(0.0)
-                all_labels.append(labels[k])
-
-        comment = (
-            "HSE run along symmetry lines"
-            if mode.lower() == "line"
-            else "HSE run on uniform grid"
-        )
-
-        return Kpoints(
-            comment=comment,
-            style=Kpoints.supported_modes.Reciprocal,
-            num_kpts=len(kpts),
-            kpts=kpts,
-            kpts_weights=weights,
-            labels=all_labels,
-        )
-
-
     modify_kpoints_params = modify_kpoints_params or {
         "twod_kpoints_update": ">>twod_kpoints_update<<"
     }
-
-    added_kpoints = modify_kpoints_params.get("added_kpoints", None)
-    reciprocal_density = modify_kpoints_params.get("reciprocal_density", 50)
-    kpoints_line_density = modify_kpoints_params.get("kpoints_line_density", 20)
-    mode = modify_kpoints_params.get("mode", "line")
-
-    kpoints = twod_bs_kpoints(
-        structure=Structure.from_file("POSCAR"),
-        added_kpoints=added_kpoints,
-        reciprocal_density=reciprocal_density,
-        kpoints_line_density=kpoints_line_density,
-        mode=mode
-    )
 
     idx_list = get_fws_and_tasks(
         original_wf,
@@ -339,6 +266,7 @@ def add_modify_twod_bs_kpoints(
     )
     for idx_fw, idx_t in idx_list:
         original_wf.fws[idx_fw].tasks.insert(
-            idx_t, WriteVaspFromPMGObjects(kpints=kpoints)
+            idx_t,
+            WriteTwoDBSKpoints(**modify_kpoints_params)
         )
     return original_wf
