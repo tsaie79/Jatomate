@@ -409,3 +409,43 @@ class WriteTwoDBSKpoints(FiretaskBase):
             kpts_weights=weights,
             labels=all_labels,
         ).write_file("KPOINTS")
+
+
+@explicit_serialize
+class WriteVaspHSEBSFromPrev(FiretaskBase):
+    """
+    Writes input files for HSE band structure run. Assumes that output files
+    from a previous job can be accessed. Since HSE always re-optimizes the
+    charge density (no nSCF mode), the previous job is used to get the location
+    of VBM/CBM for mode="gap" (otherwise just used to get the structure /
+    starting charge density).
+
+    Optional params:
+        potcar_spec (bool): Instead of writing the POTCAR, write a
+            "POTCAR.spec". This is intended to allow testing of workflows
+            without requiring pseudo-potentials to be installed on the system.
+        (documentation for all other optional params can be found in
+        MPHSEBSSet)
+    """
+
+    required_params = []
+    optional_params = [
+        "prev_calc_dir",
+        "mode",
+        "reciprocal_density",
+        "kpoints_line_density",
+        "potcar_spec",
+        "other_params"
+    ]
+
+    def run_task(self, fw_spec):
+        vis = MPHSEBSSet.from_prev_calc(
+            self.get("prev_calc_dir", "."),
+            mode=self.get("mode", "uniform"),
+            reciprocal_density=self.get("reciprocal_density", 50),
+            kpoints_line_density=self.get("kpoints_line_density", 10),
+            copy_chgcar=False,
+            **self.get("other_params", {})
+        )
+        potcar_spec = self.get("potcar_spec", False)
+        vis.write_input(".", potcar_spec=potcar_spec)
