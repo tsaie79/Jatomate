@@ -19,10 +19,10 @@ import json
 @explicit_serialize
 class RunPyzfs(FiretaskBase):
     """
-    run pyzfs
+    run pytopomat
     zfs_cmd:
-        srun -n 2048 -c 2 python /home/tug03990/site-packages/pyzfs/examples/VASP/run.py > out (cori)
-        mpiexec -n 20 pyzfs --wfcfmt vasp > out (owls, efrc)
+        srun -n 2048 -c 2 python /home/tug03990/site-packages/pytopomat/examples/VASP/run.py > out (cori)
+        mpiexec -n 20 pytopomat --wfcfmt vasp > out (owls, efrc)
     """
     required_params = ["pyzfs_cmd"]
 

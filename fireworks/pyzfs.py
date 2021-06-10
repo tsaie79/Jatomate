@@ -11,7 +11,7 @@ class PyzfsFW(Firework):
             self,
             parents=None,
             structure=None,
-            name="pyzfs",
+            name="pytopomat",
             prev_calc_dir=None,
             pyzfs_cmd=">>pyzfs_cmd<<",
             db_file=DB_FILE,
