@@ -11,14 +11,11 @@ from atomate.common.firetasks.glue_tasks import get_calc_loc, PassResult, \
 from atomate.vasp.database import VaspCalcDb
 from atomate.utils.utils import env_chk
 
-import shutil
-import gzip
-import os
-import re
-import traceback
-from glob import glob
-import time
 from monty.shutil import compress_dir, decompress_dir
+
+from glob import glob
+
+import shutil, gzip, os, re, traceback, time
 
 
 @explicit_serialize
@@ -449,3 +446,4 @@ class WriteVaspHSEBSFromPrev(FiretaskBase):
         )
         potcar_spec = self.get("potcar_spec", False)
         vis.write_input(".", potcar_spec=potcar_spec)
+
