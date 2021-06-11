@@ -3,9 +3,6 @@ from fireworks import explicit_serialize, FiretaskBase, FWAction
 from atomate.utils.utils import env_chk, get_logger, logger
 from atomate.vasp.database import VaspCalcDb
 
-from pyzfs.common.wfc.vasploader import VaspWavefunctionLoader
-from pyzfs.zfs.main import ZFSCalculation
-
 from pymatgen.io.vasp.inputs import Structure
 
 from monty.serialization import loadfn
