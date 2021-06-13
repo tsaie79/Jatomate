@@ -30,6 +30,7 @@ class IrvspFW(Firework):
             structure=None,
             name="irvsp",
             set_spn = None,
+            symprec = None,
             run_all_kpoints=True,
             wf_uuid=None,
             db_file=DB_FILE,
