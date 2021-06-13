@@ -84,9 +84,9 @@ class IrvspFW(Firework):
             raise ValueError("Must specify structure or previous calculation")
 
         if run_all_kpoints:
-            t.append(RunIRVSPAll(set_spn=set_spn))
+            t.append(RunIRVSPAll(set_spn=set_spn, symprec=symprec))
         else:
-            t.append(RunIRVSP(set_spn=set_spn))
+            t.append(RunIRVSP(set_spn=set_spn, symprec=symprec))
 
         t.extend(
             [
