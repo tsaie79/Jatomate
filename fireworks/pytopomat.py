@@ -16,7 +16,7 @@ from atomate.vasp.firetasks.parse_outputs import VaspToDb
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 
 
-from pytopomat.workflows.firetasks import (
+from my_atomate.firetasks.pytopomat import (
     RunIRVSP,
     RunIRVSPAll,
     IRVSPToDb
