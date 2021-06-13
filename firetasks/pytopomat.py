@@ -44,7 +44,8 @@ class RunIRVSP(FiretaskBase):
     def run_task(self, fw_spec):
 
         wd = os.getcwd()
-        IRVSPCaller(wd)
+        set_spn = self.get("set_spn", None)
+        IRVSPCaller(wd, set_spn=set_spn)
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")
@@ -81,7 +82,8 @@ class RunIRVSPAll(FiretaskBase):
     def run_task(self, fw_spec):
 
         wd = os.getcwd()
-        IRVSPCaller(wd)
+        set_spn = self.get("set_spn", None)
+        IRVSPCaller(wd, set_spn=set_spn)
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")

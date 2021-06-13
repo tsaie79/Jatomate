@@ -29,6 +29,7 @@ class IrvspFW(Firework):
             parents=None,
             structure=None,
             name="irvsp",
+            set_spn = None,
             run_all_kpoints=True,
             wf_uuid=None,
             db_file=DB_FILE,
@@ -83,9 +84,9 @@ class IrvspFW(Firework):
             raise ValueError("Must specify structure or previous calculation")
 
         if run_all_kpoints:
-            t.append(RunIRVSPAll())
+            t.append(RunIRVSPAll(set_spn=set_spn))
         else:
-            t.append(RunIRVSP())
+            t.append(RunIRVSP(set_spn=set_spn))
 
         t.extend(
             [
