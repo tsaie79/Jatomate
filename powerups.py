@@ -1,4 +1,4 @@
-from my_atomate.vasp.firetasks import WriteTwoDBSKpoints
+from my_atomate.vasp.firetasks.firetasks import WriteTwoDBSKpoints
 
 from atomate.common.firetasks.glue_tasks import DeleteFiles
 from atomate.utils.utils import get_meta_from_structure, get_fws_and_tasks
