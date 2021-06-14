@@ -6,7 +6,7 @@ FWs for wflows.
 import warnings
 import os
 
-from fireworks import Firework
+from fireworks.fireworks import Firework
 
 from pymatgen import Structure
 
