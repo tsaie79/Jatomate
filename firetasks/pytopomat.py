@@ -87,7 +87,7 @@ class RunIRVSPAll(FiretaskBase):
         wd = os.getcwd()
         set_spn = self["set_spn"]
         symprec = self["symprec"]
-        IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
+        sga, sgn = IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")
