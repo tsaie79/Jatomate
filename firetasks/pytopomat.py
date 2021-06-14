@@ -85,6 +85,7 @@ class RunIRVSPAll(FiretaskBase):
         wd = os.getcwd()
         set_spn = self.get("set_spn", None)
         symprec = self.get("symprec", 0.01)
+        print(symprec)
         IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
