@@ -1,4 +1,4 @@
-import warnings, os
+import warnings
 
 from fireworks import Firework
 
@@ -6,51 +6,35 @@ from pymatgen import Structure
 from pymatgen.io.vasp.sets import (
     MPRelaxSet,
     MPHSERelaxSet,
-    MPHSEBSSet,
-    MPScanStaticSet,
-    MPScanRelaxSet,
     MVLScanRelaxSet,
     MVLGWSet,
-    MITRelaxSet,
-    MPStaticSet,
     MPSOCSet,
 )
 
 from atomate.common.firetasks.glue_tasks import (
     PassCalcLocs,
-    GzipDir,
     CopyFiles,
-    DeleteFiles,
-    CopyFilesFromCalcLoc,
 )
 from atomate.vasp.config import (
     HALF_KPOINTS_FIRST_RELAX,
     RELAX_MAX_FORCE,
-    VASP_CMD,
-    DB_FILE,
 )
-from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs, pass_vasp_result
-from atomate.vasp.firetasks.parse_outputs import VaspToDb, BoltztrapToDb
+from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
+from atomate.vasp.firetasks.parse_outputs import VaspToDb
 from atomate.vasp.firetasks.run_calc import (
     RunVaspCustodian,
-    RunBoltztrap,
 )
 from atomate.vasp.firetasks.write_inputs import (
-    WriteNormalmodeDisplacedPoscar,
-    WriteTransmutedStructureIOSet,
     WriteVaspFromIOSet,
     WriteVaspFromPMGObjects,
-    WriteVaspNSCFFromPrev,
     WriteVaspSOCFromPrev,
     WriteVaspStaticFromPrev,
-    WriteVaspFromIOSetFromInterpolatedPOSCAR,
-    UpdateScanRelaxBandgap,
     ModifyIncar
 )
 from atomate.vasp.firetasks.jcustom import *
 from atomate.vasp.config import VASP_CMD, DB_FILE
 
-from my_atomate.vasp.firetasks.firetasks import WriteVaspHSEBSFromPrev
+from firetasks.firetasks import WriteVaspHSEBSFromPrev
 
 class JOptimizeFW(Firework):
     def __init__(

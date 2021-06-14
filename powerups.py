@@ -1,30 +1,17 @@
-from my_atomate.vasp.firetasks.firetasks import WriteTwoDBSKpoints
+from firetasks.firetasks import WriteTwoDBSKpoints
 
-from atomate.common.firetasks.glue_tasks import DeleteFiles
-from atomate.utils.utils import get_meta_from_structure, get_fws_and_tasks
+from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
-    ADD_NAMEFILE,
     GAMMA_VASP_CMD,
     VDW_KERNEL_DIR
 )
 
 from atomate.vasp.firetasks.jcustom import JFileTransferTask, JWriteInputsFromDB
-from atomate.vasp.firetasks.glue_tasks import CheckStability, CheckBandgap, CopyFiles
-from atomate.vasp.firetasks.neb_tasks import RunNEBVaspFake
-from atomate.vasp.firetasks.parse_outputs import JsonToDb
-from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyPotcar, ModifyKpoints, WriteVaspFromPMGObjects
+from atomate.vasp.firetasks.glue_tasks import CheckBandgap, CopyFiles
+from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyKpoints, WriteVaspFromPMGObjects
 
-from fireworks import Workflow, FileWriteTask
-from fireworks.core.firework import Tracker
-from fireworks.utilities.fw_utilities import get_slug
 from pymatgen import Structure
 from pymatgen.io.vasp.sets import MPRelaxSet
-from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
-from pymatgen.symmetry.bandstructure import HighSymmKpath
-
-
-
-import os
 
 __author__ = "Jeng-Yuan Tsai"
 __email__ = "tsaie79@gmail.com"
