@@ -45,8 +45,8 @@ class RunIRVSP(FiretaskBase):
 
         wd = os.getcwd()
         set_spn = self.get("set_spn", None)
-        sympec = self.get("symprec", 0.01)
-        IRVSPCaller(wd, set_spn=set_spn, symprec=sympec)
+        symprec = self.get("symprec", 0.01)
+        IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")
@@ -84,8 +84,8 @@ class RunIRVSPAll(FiretaskBase):
 
         wd = os.getcwd()
         set_spn = self.get("set_spn", None)
-        sympec = self.get("symprec", 0.01)
-        IRVSPCaller(wd, set_spn=set_spn, symprec=sympec)
+        symprec = self.get("symprec", 0.01)
+        IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")
