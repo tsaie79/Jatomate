@@ -7,7 +7,7 @@ from atomate.vasp.powerups import use_fake_vasp, add_namefile, add_additional_fi
     add_modify_incar, add_modify_kpoints, set_queue_options, set_execution_options
 from atomate.vasp.config import GAMMA_VASP_CMD
 
-from fireworks import Firework, LaunchPad, Workflow
+from my_atomate.vasp.fireworks import Firework, LaunchPad, Workflow
 
 import numpy as np
 

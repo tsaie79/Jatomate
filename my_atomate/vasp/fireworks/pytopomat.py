@@ -3,16 +3,12 @@ FWs for wflows.
 
 """
 
-import warnings
-import os
-
-from fireworks.fireworks import Firework
+from fireworks import Firework
 
 from pymatgen import Structure
 
-from atomate.vasp.config import VASP_CMD, DB_FILE
-from atomate.common.firetasks.glue_tasks import PassCalcLocs, CopyFiles
-from atomate.vasp.firetasks.parse_outputs import VaspToDb
+from atomate.vasp.config import DB_FILE
+from atomate.common.firetasks.glue_tasks import PassCalcLocs
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 
 

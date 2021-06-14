@@ -1,4 +1,4 @@
-from fireworks import Firework
+from my_atomate.vasp.fireworks import Firework
 
 from atomate.common.firetasks.glue_tasks import PassCalcLocs
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs

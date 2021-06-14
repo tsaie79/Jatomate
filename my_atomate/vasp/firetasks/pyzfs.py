@@ -1,4 +1,4 @@
-from fireworks import explicit_serialize, FiretaskBase, FWAction
+from my_atomate.vasp.fireworks import explicit_serialize, FiretaskBase, FWAction
 
 from atomate.utils.utils import env_chk, get_logger, logger
 from atomate.vasp.database import VaspCalcDb

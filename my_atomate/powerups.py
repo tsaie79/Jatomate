@@ -23,9 +23,9 @@ from atomate.vasp.firetasks.run_calc import (
 )
 from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyPotcar, ModifyKpoints, WriteVaspFromPMGObjects
 
-from fireworks import Workflow, FileWriteTask
-from fireworks.core.firework import Tracker
-from fireworks.utilities.fw_utilities import get_slug
+from my_atomate.vasp.fireworks import Workflow, FileWriteTask
+from my_atomate.vasp.fireworks import Tracker
+from my_atomate.vasp.fireworks import get_slug
 from pymatgen import Structure
 from pymatgen.io.vasp.inputs import Kpoints
 from pymatgen.io.vasp.sets import MPRelaxSet
