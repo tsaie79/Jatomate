@@ -46,7 +46,7 @@ class RunIRVSP(FiretaskBase):
         wd = os.getcwd()
         set_spn = self["set_spn"]
         symprec = self["symprec"]
-        sga, sgn = IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
+        irvsp_caller = IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")
@@ -70,8 +70,8 @@ class RunIRVSP(FiretaskBase):
                 "structure": structure,
                 "formula": formula,
                 "efermi": efermi,
-                "post_relax_sga": sga,
-                "post_relax_sgn": sgn
+                "post_relax_sg_name": irvsp_caller.sg_name,
+                "post_relax_sg_number": irvsp_caller.sg_number
             }
         )
 
@@ -87,7 +87,7 @@ class RunIRVSPAll(FiretaskBase):
         wd = os.getcwd()
         set_spn = self["set_spn"]
         symprec = self["symprec"]
-        sga, sgn = IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
+        irvsp_caller = IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")
@@ -114,8 +114,8 @@ class RunIRVSPAll(FiretaskBase):
                 "structure": structure,
                 "formula": formula,
                 "efermi": efermi,
-                "post_relax_sga": sga,
-                "post_relax_sgn": sgn
+                "post_relax_sg_name": irvsp_caller.sg_name,
+                "post_relax_sg_number": irvsp_caller.sg_number
             }
         )
 
