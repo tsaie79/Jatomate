@@ -12,7 +12,7 @@ from atomate.common.firetasks.glue_tasks import PassCalcLocs
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 
 
-from my_atomate.firetasks.pytopomat import (
+from my_atomate.vasp.firetasks.pytopomat import (
     RunIRVSP,
     RunIRVSPAll,
     IRVSPToDb
