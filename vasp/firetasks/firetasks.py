@@ -1,4 +1,4 @@
-from my_atomate.vasp.fireworks import FiretaskBase, explicit_serialize
+from fireworks import FiretaskBase, explicit_serialize
 
 from pymatgen.io.vasp.inputs import *
 from pymatgen.io.vasp.outputs import Chgcar

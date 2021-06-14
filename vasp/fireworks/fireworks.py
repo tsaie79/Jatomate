@@ -50,7 +50,7 @@ from atomate.vasp.firetasks.write_inputs import (
 from atomate.vasp.firetasks.jcustom import *
 from atomate.vasp.config import VASP_CMD, DB_FILE
 
-from my_atomate.firetasks.firetasks import WriteVaspHSEBSFromPrev
+from my_atomate.vasp.firetasks.firetasks import WriteVaspHSEBSFromPrev
 
 class JOptimizeFW(Firework):
     def __init__(

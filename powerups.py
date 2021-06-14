@@ -1,4 +1,4 @@
-from my_atomate import WriteTwoDBSKpoints
+from my_atomate.vasp.firetasks import WriteTwoDBSKpoints
 
 from atomate.common.firetasks.glue_tasks import DeleteFiles
 from atomate.utils.utils import get_meta_from_structure, get_fws_and_tasks
@@ -14,9 +14,9 @@ from atomate.vasp.firetasks.neb_tasks import RunNEBVaspFake
 from atomate.vasp.firetasks.parse_outputs import JsonToDb
 from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyPotcar, ModifyKpoints, WriteVaspFromPMGObjects
 
-from my_atomate import Workflow, FileWriteTask
-from my_atomate import Tracker
-from my_atomate import get_slug
+from fireworks import Workflow, FileWriteTask
+from fireworks.core.firework import Tracker
+from fireworks.utilities.fw_utilities import get_slug
 from pymatgen import Structure
 from pymatgen.io.vasp.sets import MPRelaxSet
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
