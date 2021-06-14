@@ -1,33 +1,23 @@
-from my_atomate.firetasks.firetasks import WriteTwoDBSKpoints
+from my_atomate import WriteTwoDBSKpoints
 
 from atomate.common.firetasks.glue_tasks import DeleteFiles
 from atomate.utils.utils import get_meta_from_structure, get_fws_and_tasks
 from atomate.vasp.config import (
     ADD_NAMEFILE,
-    SCRATCH_DIR,
-    ADD_MODIFY_INCAR,
     GAMMA_VASP_CMD,
     VDW_KERNEL_DIR
 )
 
 from atomate.vasp.firetasks.jcustom import JFileTransferTask, JWriteInputsFromDB
 from atomate.vasp.firetasks.glue_tasks import CheckStability, CheckBandgap, CopyFiles
-from atomate.vasp.firetasks.lobster_tasks import RunLobsterFake
 from atomate.vasp.firetasks.neb_tasks import RunNEBVaspFake
 from atomate.vasp.firetasks.parse_outputs import JsonToDb
-from atomate.vasp.firetasks.run_calc import (
-    RunVaspCustodian,
-    RunVaspFake,
-    RunVaspDirect,
-    RunNoVasp,
-)
 from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyPotcar, ModifyKpoints, WriteVaspFromPMGObjects
 
-from my_atomate.vasp.fireworks import Workflow, FileWriteTask
-from my_atomate.vasp.fireworks import Tracker
-from my_atomate.vasp.fireworks import get_slug
+from my_atomate import Workflow, FileWriteTask
+from my_atomate import Tracker
+from my_atomate import get_slug
 from pymatgen import Structure
-from pymatgen.io.vasp.inputs import Kpoints
 from pymatgen.io.vasp.sets import MPRelaxSet
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.symmetry.bandstructure import HighSymmKpath
