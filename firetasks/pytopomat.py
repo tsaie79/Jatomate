@@ -45,7 +45,6 @@ class RunIRVSP(FiretaskBase):
 
         wd = os.getcwd()
         set_spn = self.get("set_spn", None)
-        print(self.get("symprec"))
         sympec = self.get("symprec", 0.01)
         IRVSPCaller(wd, set_spn=set_spn, symprec=sympec)
 
