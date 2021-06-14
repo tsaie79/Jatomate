@@ -44,8 +44,8 @@ class RunIRVSP(FiretaskBase):
     def run_task(self, fw_spec):
 
         wd = os.getcwd()
-        set_spn = self.get("set_spn", None)
-        symprec = self.get("symprec", 0.01)
+        set_spn = self["set_spn"]
+        symprec = self["symprec"]
         IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
@@ -79,13 +79,12 @@ class RunIRVSPAll(FiretaskBase):
     Execute IRVSP in current directory.
 
     """
-    optional_params = ["set_spn", "symprec"]
+    required_params = ["set_spn", "symprec"]
     def run_task(self, fw_spec):
 
         wd = os.getcwd()
-        set_spn = self.get("set_spn", None)
-        symprec = self.get("symprec", 0.01)
-        print(symprec)
+        set_spn = self["set_spn"]
+        symprec = self["symprec"]
         IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
 
         try:
