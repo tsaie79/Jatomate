@@ -1,4 +1,4 @@
-from firetasks.firetasks import WriteTwoDBSKpoints
+from my_atomate.firetasks.firetasks import WriteTwoDBSKpoints
 
 from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
