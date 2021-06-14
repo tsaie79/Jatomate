@@ -80,7 +80,7 @@ class RunIRVSPAll(FiretaskBase):
     Execute IRVSP in current directory.
 
     """
-
+    optional_params = ["set_spn", "symprec"]
     def run_task(self, fw_spec):
 
         wd = os.getcwd()
