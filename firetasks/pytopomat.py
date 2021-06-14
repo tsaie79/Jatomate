@@ -88,6 +88,8 @@ class RunIRVSPAll(FiretaskBase):
         set_spn = self["set_spn"]
         symprec = self["symprec"]
         irvsp_caller = IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
+        sg_name = irvsp_caller.sg_name
+        sg_number = irvsp_caller.sg_number
 
         try:
             raw_struct = Structure.from_file(wd + "/POSCAR")
@@ -114,8 +116,8 @@ class RunIRVSPAll(FiretaskBase):
                 "structure": structure,
                 "formula": formula,
                 "efermi": efermi,
-                "post_relax_sg_name": irvsp_caller.sg_name,
-                "post_relax_sg_number": irvsp_caller.sg_number
+                "post_relax_sg_name": sg_name,
+                "post_relax_sg_number": sg_number
             }
         )
 
@@ -188,8 +190,8 @@ class IRVSPToDb(FiretaskBase):
         d["structure"] = fw_spec["structure"]
         d["irvsp"] = irvsp
         d["dir_name"] = os.getcwd()
-        d["post_relax_sg_name"] = str(fw_spec["post_relax_sg_name"]),
-        d["post_relax_sg_number"] = str(fw_spec["post_relax_sg_number"])
+        d["post_relax_sg_name"] = fw_spec["post_relax_sg_name"],
+        d["post_relax_sg_number"] = fw_spec["post_relax_sg_number"]
         # store the results
         db_file = env_chk(self.get("db_file"), fw_spec)
         if not db_file:
