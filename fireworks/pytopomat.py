@@ -84,7 +84,6 @@ class IrvspFW(Firework):
         else:
             t.append(RunIRVSP(set_spn=set_spn, symprec=symprec))
 
-        print(irvsptodb_kwargs)
         t.extend(
             [
                 PassCalcLocs(name=name),
