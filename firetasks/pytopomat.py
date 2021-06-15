@@ -119,6 +119,47 @@ class RunIRVSPAll(FiretaskBase):
             }
         )
 
+@explicit_serialize
+class RunIRVSPsingleKpt(FiretaskBase):
+    """
+    Execute IRVSP in current directory.
+
+    """
+    required_params = ["set_spn", "symprec"]
+    def run_task(self, fw_spec):
+
+        wd = os.getcwd()
+        set_spn = self["set_spn"]
+        symprec = self["symprec"]
+        irvsp_caller = IRVSPCaller(wd, set_spn=set_spn, symprec=symprec)
+
+        try:
+            raw_struct = Structure.from_file(wd + "/POSCAR")
+            formula = raw_struct.composition.formula
+            structure = raw_struct.as_dict()
+
+            outcar = Outcar(wd + "/OUTCAR")
+            efermi = outcar.efermi
+
+        except:
+            formula = None
+            structure = None
+            efermi = None
+
+        general = IRVSPOutputAll(wd + "/outir.txt")
+        data = general.as_dict().copy()
+        data["parity_eigenvals"] = {"single_kpt": general.parity_eigenvals}
+
+        return FWAction(
+            update_spec={
+                "irvsp_out": data,
+                "structure": structure,
+                "formula": formula,
+                "efermi": efermi,
+                "post_relax_sg_name": irvsp_caller.sg_name,
+                "post_relax_sg_number": irvsp_caller.sg_number
+            }
+        )
 
 @explicit_serialize
 class StandardizeCell(FiretaskBase):
