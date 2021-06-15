@@ -14,6 +14,7 @@ from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 from my_atomate.firetasks.pytopomat import (
     RunIRVSP,
     RunIRVSPAll,
+    RunIRVSPsingleKpt,
     IRVSPToDb
 )
 
@@ -26,7 +27,7 @@ class IrvspFW(Firework):
             name="irvsp",
             set_spn=None,
             symprec=0.01,
-            run_all_kpoints=True,
+            kpt_mode=True,
             wf_uuid=None,
             db_file=DB_FILE,
             prev_calc_dir=None,
@@ -79,10 +80,12 @@ class IrvspFW(Firework):
         else:
             raise ValueError("Must specify structure or previous calculation")
 
-        if run_all_kpoints:
+        if kpt_mode == "all":
             t.append(RunIRVSPAll(set_spn=set_spn, symprec=symprec))
-        else:
+        elif kpt_mode == "high_symmetry":
             t.append(RunIRVSP(set_spn=set_spn, symprec=symprec))
+        elif kpt_mode == "single_kpt":
+            t.append(RunIRVSPsingleKpt(set_spn=set_spn, symprec=symprec))
 
         t.extend(
             [
