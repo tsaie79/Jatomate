@@ -7,8 +7,7 @@ from atomate.vasp.powerups import add_namefile, add_additional_fields_to_taskdoc
 
 from vasp.fireworks.fireworks import *
 
-from vasp.fireworks import Workflow
-
+from fireworks import Workflow
 
 import numpy as np
 
