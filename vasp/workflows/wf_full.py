@@ -1,6 +1,7 @@
 import os.path
 
 from pymatgen.io.vasp.inputs import Kpoints
+from pymatgen.io.vasp.sets import MPScanRelaxSet
 
 from atomate.vasp.fireworks.core import HSEBSFW
 from atomate.vasp.powerups import *
