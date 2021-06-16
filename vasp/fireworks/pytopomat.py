@@ -3,7 +3,7 @@ FWs for wflows.
 
 """
 
-from vasp.fireworks import Firework
+from fireworks import Firework
 
 from pymatgen import Structure
 

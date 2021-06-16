@@ -1,6 +1,6 @@
 import warnings
 
-from vasp.fireworks import Firework
+from fireworks import Firework
 
 from pymatgen import Structure
 from pymatgen.io.vasp.sets import (

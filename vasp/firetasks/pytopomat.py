@@ -23,8 +23,8 @@ from pytopomat.vasp2trace_caller import (
 )
 from pytopomat.z2pack_caller import Z2PackCaller
 
-from vasp.fireworks import explicit_serialize, FiretaskBase, FWAction
-from vasp.fireworks import DATETIME_HANDLER
+from fireworks import explicit_serialize, FiretaskBase, FWAction
+from fireworks import DATETIME_HANDLER
 
 from atomate.utils.utils import env_chk, get_logger
 from atomate.utils.database import CalcDb
