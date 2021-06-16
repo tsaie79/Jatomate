@@ -453,10 +453,13 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
             uis["user_incar_settings"].update({"EMAX": 10, "EMIN": -10, "NEDOS": 9000})
 
         wf = get_wf(structure, os.path.join(os.path.dirname(os.path.abspath(__file__)), "general/scan.yaml"))
+        if dos:
+            wf = add_modify_incar(wf, {"incar_update": {"EMAX": 10, "EMIN": -10, "NEDOS": 9000}}, fw_name_constraint="SCAN_scf")
         if uis.get("user_incar_settings"):
             wf = add_modify_incar(wf, {"incar_update": uis["user_incar_settings"]})
         if uis.get("user_kpoints_settings"):
             wf = add_modify_kpoints(wf, {"kpoints_update": uis["user_kpoints_settings"]})
+
         vasptodb.update({"wf": [fw.name for fw in wf.fws], "charge_state": cs, "nupdown_set": nupdown})
         wf = add_additional_fields_to_taskdocs(wf, vasptodb)
         fws.extend(wf.fws)
