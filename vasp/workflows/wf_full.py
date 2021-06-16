@@ -459,7 +459,7 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
             wf = add_modify_kpoints(wf, {"kpoints_update": uis["user_kpoints_settings"]})
         vasptodb.update({"wf": [fw.name for fw in wf.fws], "charge_state": cs, "nupdown_set": nupdown})
         wf = add_additional_fields_to_taskdocs(wf, vasptodb)
-        fws.append(wf.fws)
+        fws.extend(wf.fws)
 
     wf_name = "{}:{}:q{}:sp{}".format("".join(structure.formula.split(" ")), wf_addition_name, charge_states, nupdowns)
     wf = Workflow(fws, name=wf_name)
