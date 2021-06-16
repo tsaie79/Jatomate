@@ -33,7 +33,7 @@ from atomate.vasp.firetasks.write_inputs import (
 )
 from atomate.vasp.config import VASP_CMD, DB_FILE
 
-from ..firetasks import *
+from ..firetasks.firetasks import *
 
 class JOptimizeFW(Firework):
     def __init__(
