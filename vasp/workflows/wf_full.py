@@ -1,9 +1,10 @@
+import os.path
+
 from pymatgen.io.vasp.inputs import Kpoints
 
 from atomate.vasp.fireworks.core import HSEBSFW
-from atomate.vasp.fireworks.jcustom import *
-from atomate.vasp.powerups import add_namefile, add_additional_fields_to_taskdocs, preserve_fworker, \
-    add_modify_incar, set_execution_options
+from atomate.vasp.powerups import *
+from atomate.vasp.workflows.base.core import get_wf
 
 from vasp.fireworks.fireworks import *
 
@@ -266,6 +267,131 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
     return wf
 
 
+# def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupdowns, task, category,
+#                      vasptodb=None, wf_addition_name=None):
+#
+#     encut = 1.3*max([potcar.enmax for potcar in MPScanRelaxSet(structure).potcar])
+#     print("SET ENCUT:{}".format(encut))
+#
+#     vasptodb = vasptodb or {}
+#
+#     fws = []
+#     wf = get_wf(structure, os.path.join(os.path.dirname("__file__"), "general/scan.yaml"))
+#     for cs, nupdown in zip(charge_states, nupdowns):
+#         print("Formula: {}".format(structure.formula))
+#         if structure.site_properties.get("magmom", None):
+#             structure.remove_site_property("magmom")
+#         structure.set_charge(cs)
+#         nelect = MPRelaxSet(structure, use_structure_charge=True).nelect
+#         user_incar_settings = {
+#             "ENCUT": encut,
+#             "NUPDOWN": nupdown,
+#             "NELECT": nelect
+#         }
+#
+#         if gamma_only is True:
+#             user_kpoints_settings = Kpoints.gamma_automatic()
+#             # user_kpoints_settings = MPRelaxSet(structure).kpoints
+#
+#         elif gamma_only:
+#             nkpoints = len(gamma_only)
+#             kpts_weights = [1.0 for i in np.arange(nkpoints)]
+#             labels = [None for i in np.arange(nkpoints)]
+#             user_kpoints_settings = Kpoints.from_dict(
+#                 {
+#                     'comment': 'JCustom',
+#                     'nkpoints': nkpoints,
+#                     'generation_style': 'Reciprocal',
+#                     'kpoints': gamma_only,
+#                     'usershift': (0, 0, 0),
+#                     'kpts_weights': kpts_weights,
+#                     'coord_type': None,
+#                     'labels': labels,
+#                     'tet_number': 0,
+#                     'tet_weight': 0,
+#                     'tet_connections': None,
+#                     '@module': 'pymatgen.io.vasp.inputs',
+#                     '@class': 'Kpoints'
+#                 }
+#             )
+#
+#         else:
+#             user_kpoints_settings = None
+#
+#         # FW1 Structure optimization firework
+#         override_default_vasp_params = {}
+#         override_default_vasp_params.update(
+#             {
+#                 "user_incar_settings": user_incar_settings,
+#                 "user_kpoints_settings": user_kpoints_settings
+#             }
+#         )
+#         vasp_input_set = VLScanRelaxSet(
+#             structure, force_gamma=gamma_mesh, **override_default_vasp_params
+#         )
+#
+#         scan_relax = wf.fws[0]
+#         scan_relax.tasks[0]["vasp_input_set"].update(vasp_input_set)
+#         scan_relax.tasks[-1].update(
+#             {
+#                 "additional_fields": {
+#                     "charge_state": cs,
+#                     "nupdown_set": nupdown,
+#                 }
+#             }
+#         )
+#
+#         # FW2 Run SCAN SCF
+#         uis_scan_scf = {
+#             "user_incar_settings": {
+#                 "ENCUT": encut,
+#                 "NUPDOWN": nupdown,
+#                 "NELECT": nelect
+#             },
+#             "user_kpoints_settings": user_kpoints_settings
+#         }
+#
+#         if dos:
+#             uis_scan_scf["user_incar_settings"].update({"EMAX": 10, "EMIN": -10, "NEDOS": 9000})
+#
+#         scan_scf = wf.fws[1]
+#         scan_scf = scan_scf.update(
+#             vasp_input_set_params=uis_scan_scf,
+#             parents=scan_relax,
+#             force_gamma=gamma_mesh,
+#             vasptodb_kwargs={
+#                 "additional_fields": {
+#                     "charge_state": cs,
+#                     "nupdown_set": nupdown,
+#                 },
+#             })
+#
+#         irvsp = wf.fws[2]
+#         irvsp.updirvsptodb_kwargs": }
+#
+#         if task == "scan_relax":
+#             fws.append(scan_relax)
+#         elif task == "scan_scf":
+#             scan_scf.update({"parents": None})
+#             fws.append(scan_scf)
+#         elif task == "scan_relax-scan_scf":
+#             fws.append(scan_relax)
+#             fws.append(scan_scf)
+#
+#         if add_ir:
+#             irvsp.update({"parents": fws.[-1]})
+#             fws.append(irvsp)
+#
+#     wf_name = "{}:{}:q{}:sp{}".format("".join(structure.formula.split(" ")), wf_addition_name, charge_states, nupdowns)
+#     wf = Workflow(fws, name=wf_name)
+#     vasptodb.update({"wf": [fw.name for fw in wf.fws]})
+#     wf = add_additional_fields_to_taskdocs(wf, vasptodb)
+#     wf = set_execution_options(wf, category=category)
+#     wf = preserve_fworker(wf)
+#     wf = add_namefile(wf)
+#     wf = add_modify_incar(wf)
+#     return wf
+
 def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupdowns, task, category,
                      vasptodb=None, wf_addition_name=None):
 
@@ -281,27 +407,17 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
             structure.remove_site_property("magmom")
         structure.set_charge(cs)
         nelect = MPRelaxSet(structure, use_structure_charge=True).nelect
-        user_incar_settings = {
-            "ENCUT": encut,
-            "ISIF": 2,
-            "ISMEAR": 0,
-            "SIGMA": 0.001,
-            "EDIFFG": -0.01,
-            "LCHARG": False,
-            "NUPDOWN": nupdown,
-        }
-
-        user_incar_settings.update({"NELECT": nelect})
 
         if gamma_only is True:
-            user_kpoints_settings = Kpoints.gamma_automatic()
+            kpt = Kpoints.gamma_automatic()
+            user_kpoints_settings = kpt.__dict__
             # user_kpoints_settings = MPRelaxSet(structure).kpoints
 
         elif gamma_only:
             nkpoints = len(gamma_only)
             kpts_weights = [1.0 for i in np.arange(nkpoints)]
             labels = [None for i in np.arange(nkpoints)]
-            user_kpoints_settings = Kpoints.from_dict(
+            kpt = Kpoints.from_dict(
                 {
                     'comment': 'JCustom',
                     'nkpoints': nkpoints,
@@ -318,83 +434,34 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
                     '@class': 'Kpoints'
                 }
             )
+            user_kpoints_settings = kpt.__dict__
 
         else:
             user_kpoints_settings = None
 
-        # FW1 Structure optimization firework
-        scan_relax = JScanOptimizeFW(
-            structure=structure,
-            override_default_vasp_params={
-                "user_incar_settings": user_incar_settings,
-                "user_kpoints_settings": user_kpoints_settings
-            },
-            job_type="normal",
-            max_force_threshold=False,
-            force_gamma=gamma_mesh,
-            name="SCAN_relax",
-            vasptodb_kwargs={
-                "additional_fields": {
-                    "task_type": "JScanOptimizeFW",
-                    "charge_state": cs,
-                    "nupdown_set": nupdown,
-                },
-                "parse_dos": False,
-                "parse_eigenvalues": False,
-                "parse_chgcar": False
-            }
-        )
-
-        # FW2 Run SCAN SCF
-        uis_scan_scf = {
+        uis = {
             "user_incar_settings": {
-                "LAECHG": False,
-                "EDIFF": 1e-05,
                 "ENCUT": encut,
-                "ISMEAR": 0,
-                "LCHARG": False,
-                "LWAVE": True,
                 "NUPDOWN": nupdown,
+                "NELECT": nelect
             },
             "user_kpoints_settings": user_kpoints_settings
         }
 
         if dos:
-            uis_scan_scf["user_incar_settings"].update({"EMAX": 10, "EMIN": -10, "NEDOS": 9000})
+            uis["user_incar_settings"].update({"EMAX": 10, "EMIN": -10, "NEDOS": 9000})
 
-        uis_scan_scf["user_incar_settings"].update({"NELECT": nelect})
-
-        def scan_scf(parents):
-            fw = JScanStaticFW(
-                structure=structure,
-                vasp_input_set_params=uis_scan_scf,
-                parents=parents,
-                force_gamma=gamma_mesh,
-                name="SCAN_scf",
-                vasptodb_kwargs={
-                    "additional_fields": {
-                        "task_type": " JScanStaticFW",
-                        "charge_state": cs,
-                        "nupdown_set": nupdown,
-                    },
-                    "parse_dos": True,
-                    "parse_eigenvalues": True,
-                    "parse_chgcar": False
-                })
-            return fw
-
-        if task == "scan_relax":
-            fws.append(scan_relax)
-        elif task == "scan_scf":
-            fws.append(scan_scf(None))
-        elif task == "scan_relax-scan_scf":
-            fws.append(scan_relax)
-            fws.append(scan_scf(fws[-1]))
+        wf = get_wf(structure, os.path.join(os.path.dirname("__file__"), "general/scan.yaml"))
+        if uis.get("user_incar_settings"):
+            wf = add_modify_incar(wf, {"incar_update": uis["user_incar_settings"]})
+        if uis.get("user_kpoints_settings"):
+            wf = add_modify_kpoints(wf, {"kpoints_update": uis["user_kpoints_settings"]})
+        vasptodb.update({"wf": [fw.name for fw in wf.fws], "charge_state": cs, "nupdown_set": nupdown})
+        wf = add_additional_fields_to_taskdocs(wf, vasptodb)
+        fws.append(wf.fws)
 
     wf_name = "{}:{}:q{}:sp{}".format("".join(structure.formula.split(" ")), wf_addition_name, charge_states, nupdowns)
     wf = Workflow(fws, name=wf_name)
-    vasptodb.update({"wf": [fw.name for fw in wf.fws]})
-    wf = add_additional_fields_to_taskdocs(wf, vasptodb)
     wf = set_execution_options(wf, category=category)
     wf = preserve_fworker(wf)
     wf = add_namefile(wf)

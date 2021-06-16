@@ -1,16 +1,53 @@
 fireworks:
-- fw: my_atomate.fireworks.fireworks.core.OptimizeFW
-- fw: atomate.vasp.fireworks.core.StaticFW
+- fw: my_atomate.vasp.fireworks.fireworks.ScanRelaxFW
   params:
+    name: SCAN_relax
+    force_gamma: True
+    override_default_vasp_params:
+      user_incar_settings:
+        ISIF: 2
+        ISMEAR: 0
+        SIGMA: 0.001
+        EDIFFG: -0.01
+        LCHARG: False
+      user_kpoints_settings:
+
+    job_type: normal
+    max_force_threshold: False
+    vasptodb_kwargs:
+      additional_fields:
+        task_type: "ScanRelaxFW"
+      parse_dos: False
+      parse_eigenvalues: False
+      parse_chgcar: False
+}
+  )
+- fw: my_atomate.vasp.fireworks.fireworks.ScanStaticFW
+  params:
+    name: SCAN_scf
     parents: 0
-- fw: atomate.vasp.fireworks.core.NonSCFFW
+    force_gamma: True
+    vasp_input_set_params:
+      user_incar_settings:
+        LAECHG: False
+        EDIFF: 1e-05
+        ISMEAR: 0
+        LCHARG: False
+        LWAVE: True
+      user_kpoints_settings:
+
+    vasptodb_kwargs:
+      additional_fields:
+        task_type: ScanStaticFW
+      parse_dos: True
+      parse_eigenvalues: True
+      parse_chgcar: False
+
+- fw: my_atomate.vasp.fireworks.pytopomat.IrvspFW
   params:
+    name: irvsp
     parents: 1
-    mode: line
-    input_set_overrides:
-      kpoints_line_density: 0.5
-      other_params:
-        two_d_kpoints: True
-- fw: pytopomat.workflows.fireworks.IrvspFW
-  params:
-    parents: 2
+    kpt_mode: single_kpt
+    symprec: 0.001
+    irvsptodb_kwargs:
+      collection_name: ir_data

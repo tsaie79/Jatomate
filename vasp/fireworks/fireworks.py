@@ -31,10 +31,9 @@ from atomate.vasp.firetasks.write_inputs import (
     WriteVaspStaticFromPrev,
     ModifyIncar
 )
-from atomate.vasp.firetasks.jcustom import *
 from atomate.vasp.config import VASP_CMD, DB_FILE
 
-from vasp.firetasks.firetasks import WriteVaspHSEBSFromPrev
+from vasp.firetasks.firetasks import *
 
 class JOptimizeFW(Firework):
     def __init__(
