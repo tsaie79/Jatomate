@@ -232,13 +232,12 @@ class IRVSPToDb(FiretaskBase):
         d["post_relax_sg_name"] = fw_spec["post_relax_sg_name"],
         d["post_relax_sg_number"] = fw_spec["post_relax_sg_number"]
         # store the results
-        db_file = env_chk(self.get("db_file"), fw_spec)
+        db_file = env_chk(self.get("db_file", ">>db_file<<"), fw_spec)
         if not db_file:
             with open("irvsp.json", "w") as f:
                 f.write(json.dumps(d, default=DATETIME_HANDLER, indent=4))
         else:
             db = VaspCalcDb.from_db_file(db_file, admin=True)
-            print(self["collection_name"])
             db.collection = db.db[self.get("collection_name", db.collection.name)]
             t_id = db.insert(d)
             logger.info("IRVSP calculation complete.")
