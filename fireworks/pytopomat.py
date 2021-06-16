@@ -27,7 +27,7 @@ class IrvspFW(Firework):
             name="irvsp",
             set_spn=None,
             symprec=0.01,
-            kpt_mode=True,
+            kpt_mode="all",
             db_file=DB_FILE,
             prev_calc_dir=None,
             irvsp_out=None,
