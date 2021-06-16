@@ -6,7 +6,7 @@ from atomate.vasp.fireworks.core import HSEBSFW
 from atomate.vasp.powerups import *
 from atomate.vasp.workflows.base.core import get_wf
 
-from vasp.fireworks.fireworks import *
+from ..fireworks import *
 
 from fireworks import Workflow
 
