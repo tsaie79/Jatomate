@@ -28,7 +28,6 @@ class IrvspFW(Firework):
             set_spn=None,
             symprec=0.01,
             kpt_mode=True,
-            wf_uuid=None,
             db_file=DB_FILE,
             prev_calc_dir=None,
             irvsp_out=None,
@@ -90,8 +89,7 @@ class IrvspFW(Firework):
         t.extend(
             [
                 PassCalcLocs(name=name),
-                IRVSPToDb(db_file=db_file, wf_uuid=wf_uuid,
-                          irvsp_out=irvsp_out, **irvsptodb_kwargs),
+                IRVSPToDb(db_file=db_file, irvsp_out=irvsp_out, **irvsptodb_kwargs),
             ]
         )
 

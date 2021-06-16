@@ -212,18 +212,17 @@ class IRVSPToDb(FiretaskBase):
 
     """
 
-    required_params = ["irvsp_out", "wf_uuid"]
+    required_params = ["irvsp_out"]
     optional_params = ["db_file", "additional_fields", "collection_name"]
 
     def run_task(self, fw_spec):
 
-        irvsp = self["irvsp_out"] or fw_spec["irvsp_out"]
+        irvsp = self.get("irvsp_out") or fw_spec["irvsp_out"]
 
         irvsp = jsanitize(irvsp)
 
         additional_fields = self.get("additional_fields", {})
         d = additional_fields.copy()
-        d["wf_uuid"] = self["wf_uuid"]
         d["formula"] = fw_spec["formula"]
         d["efermi"] = fw_spec["efermi"]
         d["structure"] = fw_spec["structure"]
