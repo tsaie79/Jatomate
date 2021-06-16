@@ -1,5 +1,5 @@
 fireworks:
-- fw: my_atomate.vasp.fireworks.fireworks.ScanRelaxFW
+- fw: my_atomate_jyt.vasp.fireworks.fireworks.ScanRelaxFW
   params:
     name: SCAN_relax
     force_gamma: True
@@ -19,7 +19,7 @@ fireworks:
       parse_eigenvalues: False
       parse_chgcar: False
 
-- fw: my_atomate.vasp.fireworks.fireworks.ScanStaticFW
+- fw: my_atomate_jyt.vasp.fireworks.fireworks.ScanStaticFW
   params:
     name: SCAN_scf
     parents: 0
@@ -38,7 +38,7 @@ fireworks:
       parse_eigenvalues: True
       parse_chgcar: False
 
-- fw: my_atomate.vasp.fireworks.pytopomat.IrvspFW
+- fw: my_atomate_jyt.vasp.fireworks.pytopomat.IrvspFW
   params:
     name: irvsp
     parents: 1
