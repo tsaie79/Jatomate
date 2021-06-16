@@ -357,7 +357,7 @@ class ScanRelaxFW(Firework):
 
         t.append(PassCalcLocs(name=name))
         t.append(VaspToDb(db_file=db_file, **vasptodb_kwargs))
-        super(JScanOptimizeFW, self).__init__(
+        super(ScanRelaxFW, self).__init__(
             t,
             parents=parents,
             name=fw_name,
@@ -448,7 +448,7 @@ class ScanStaticFW(Firework):
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"))
         t.append(PassCalcLocs(name=name))
         t.append(VaspToDb(db_file=db_file, **vasptodb_kwargs))
-        super(JScanStaticFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
+        super(ScanStaticFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
 
 
 class JHSEStaticFW(Firework):
