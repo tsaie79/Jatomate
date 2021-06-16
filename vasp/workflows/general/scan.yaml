@@ -10,18 +10,15 @@ fireworks:
         SIGMA: 0.001
         EDIFFG: -0.01
         LCHARG: False
-      user_kpoints_settings:
-
     job_type: normal
     max_force_threshold: False
     vasptodb_kwargs:
       additional_fields:
-        task_type: "ScanRelaxFW"
+        task_type: ScanRelaxFW
       parse_dos: False
       parse_eigenvalues: False
       parse_chgcar: False
-}
-  )
+
 - fw: my_atomate.vasp.fireworks.fireworks.ScanStaticFW
   params:
     name: SCAN_scf
@@ -34,8 +31,6 @@ fireworks:
         ISMEAR: 0
         LCHARG: False
         LWAVE: True
-      user_kpoints_settings:
-
     vasptodb_kwargs:
       additional_fields:
         task_type: ScanStaticFW
