@@ -8,11 +8,11 @@ from atomate.vasp.powerups import *
 from atomate.vasp.workflows.base.core import get_wf
 
 from ..fireworks.fireworks import *
+import general
 
 from fireworks import Workflow
 
 import numpy as np
-
 
 def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, task,
                     vasptodb=None, wf_addition_name=None, task_arg=None):
@@ -452,7 +452,7 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
         if dos:
             uis["user_incar_settings"].update({"EMAX": 10, "EMIN": -10, "NEDOS": 9000})
 
-        wf = get_wf(structure, "./general/scan.yaml")
+        wf = get_wf(structure, os.path.join(os.path.dirname(general.__file__)), "scan.yaml")
         if uis.get("user_incar_settings"):
             wf = add_modify_incar(wf, {"incar_update": uis["user_incar_settings"]})
         if uis.get("user_kpoints_settings"):
