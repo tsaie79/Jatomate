@@ -1,10 +1,10 @@
-from fireworks import Firework
+from vasp.fireworks import Firework
 
 from atomate.common.firetasks.glue_tasks import PassCalcLocs
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 from atomate.vasp.config import DB_FILE
 
-from firetasks.pyzfs import RunPyzfs, PyzfsToDb
+from vasp.firetasks.pyzfs import RunPyzfs, PyzfsToDb
 
 class PyzfsFW(Firework):
     def __init__(

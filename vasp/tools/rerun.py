@@ -1,5 +1,5 @@
 def rerun_irvsp(fw_id):
-    from my_atomate.fireworks.pytopomat import IrvspFW
+    from vasp.fireworks import IrvspFW
     import os, subprocess
 
     p = lpad.get_launchdir(fw_id)

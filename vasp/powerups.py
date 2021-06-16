@@ -1,14 +1,13 @@
-from my_atomate.firetasks.firetasks import WriteTwoDBSKpoints
+from vasp.firetasks.firetasks import WriteTwoDBSKpoints
 
 from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
-    GAMMA_VASP_CMD,
     VDW_KERNEL_DIR
 )
 
 from atomate.vasp.firetasks.jcustom import JFileTransferTask, JWriteInputsFromDB
-from atomate.vasp.firetasks.glue_tasks import CheckBandgap, CopyFiles
-from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyKpoints, WriteVaspFromPMGObjects
+from atomate.vasp.firetasks.glue_tasks import CopyFiles
+from atomate.vasp.firetasks.write_inputs import ModifyIncar, WriteVaspFromPMGObjects
 
 from pymatgen import Structure
 from pymatgen.io.vasp.sets import MPRelaxSet

@@ -1,15 +1,13 @@
-from pymatgen.io.vasp.sets import MPRelaxSet
-from pymatgen.io.vasp.inputs import Structure, Kpoints, Poscar
+from pymatgen.io.vasp.inputs import Kpoints
 
-from atomate.vasp.fireworks.core import OptimizeFW, StaticFW, ScanOptimizeFW, HSEBSFW, NonSCFFW
+from atomate.vasp.fireworks.core import HSEBSFW
 from atomate.vasp.fireworks.jcustom import *
-from atomate.vasp.powerups import use_fake_vasp, add_namefile, add_additional_fields_to_taskdocs, preserve_fworker, \
-    add_modify_incar, add_modify_kpoints, set_queue_options, set_execution_options
-from atomate.vasp.config import GAMMA_VASP_CMD
+from atomate.vasp.powerups import add_namefile, add_additional_fields_to_taskdocs, preserve_fworker, \
+    add_modify_incar, set_execution_options
 
-from my_atomate.fireworks.fireworks import *
+from vasp.fireworks.fireworks import *
 
-from fireworks import Firework, LaunchPad, Workflow
+from vasp.fireworks import Workflow
 
 
 import numpy as np

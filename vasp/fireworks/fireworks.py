@@ -1,6 +1,6 @@
 import warnings
 
-from fireworks import Firework
+from vasp.fireworks import Firework
 
 from pymatgen import Structure
 from pymatgen.io.vasp.sets import (
@@ -34,7 +34,7 @@ from atomate.vasp.firetasks.write_inputs import (
 from atomate.vasp.firetasks.jcustom import *
 from atomate.vasp.config import VASP_CMD, DB_FILE
 
-from my_atomate.firetasks.firetasks import WriteVaspHSEBSFromPrev
+from vasp.firetasks.firetasks import WriteVaspHSEBSFromPrev
 
 class JOptimizeFW(Firework):
     def __init__(
