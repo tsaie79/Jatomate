@@ -281,7 +281,7 @@ class JMVLGWFW(Firework):
         super(JMVLGWFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
 
 
-class JScanOptimizeFW(Firework):
+class ScanRelaxFW(Firework):
     def __init__(
             self,
             structure,
@@ -366,7 +366,7 @@ class JScanOptimizeFW(Firework):
         )
 
 
-class JScanStaticFW(Firework):
+class ScanStaticFW(Firework):
     def __init__(
             self,
             structure=None,
