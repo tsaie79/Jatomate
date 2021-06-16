@@ -452,7 +452,7 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
         if dos:
             uis["user_incar_settings"].update({"EMAX": 10, "EMIN": -10, "NEDOS": 9000})
 
-        wf = get_wf(structure, os.path.join(os.path.dirname("__file__"), "general/scan.yaml"))
+        wf = get_wf(structure, "./general/scan.yaml")
         if uis.get("user_incar_settings"):
             wf = add_modify_incar(wf, {"incar_update": uis["user_incar_settings"]})
         if uis.get("user_kpoints_settings"):
