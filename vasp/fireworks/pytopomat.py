@@ -11,7 +11,7 @@ from atomate.vasp.config import DB_FILE
 from atomate.common.firetasks.glue_tasks import PassCalcLocs
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 
-from vasp.firetasks.pytopomat import (
+from ..firetasks.pytopomat import (
     RunIRVSP,
     RunIRVSPAll,
     RunIRVSPsingleKpt,
