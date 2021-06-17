@@ -10,6 +10,8 @@ fireworks:
         SIGMA: 0.001
         EDIFFG: -0.01
         LCHARG: False
+        LWAVE: False
+        NSW: 150
     job_type: normal
     max_force_threshold: False
     vasptodb_kwargs:

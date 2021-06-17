@@ -460,6 +460,7 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
 
         vasptodb.update({"wf": [fw.name for fw in wf.fws], "charge_state": cs, "nupdown_set": nupdown})
         wf = add_additional_fields_to_taskdocs(wf, vasptodb)
+        wf = add_additional_fields_to_taskdocs(wf, {"charge_state": cs}, task_name_constraint="IRVSPToDb")
         fws.extend(wf.fws)
 
     wf_name = "{}:{}:q{}:sp{}".format("".join(structure.formula.split(" ")), wf_addition_name, charge_states, nupdowns)
