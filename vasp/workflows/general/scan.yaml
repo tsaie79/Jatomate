@@ -7,7 +7,7 @@ fireworks:
       user_incar_settings:
         ISIF: 2
         ISMEAR: 0
-        SIGMA: 0.001
+        SIGMA: 0.01
         EDIFFG: -0.01
         LCHARG: False
         LWAVE: False
@@ -33,6 +33,7 @@ fireworks:
         ISMEAR: 0
         LCHARG: False
         LWAVE: True
+        SIGMA: 0.01
     vasptodb_kwargs:
       additional_fields:
         task_type: ScanStaticFW
