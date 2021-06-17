@@ -41,7 +41,7 @@ class SelectiveDynmaicPoscar(FiretaskBase):
 
 
 @explicit_serialize
-class JWriteScanVaspStaticFromPrev(FiretaskBase):
+class WriteScanVaspStaticFromPrev(FiretaskBase):
     """
     Writes input files for a static run. Assumes that output files from a
     previous (e.g., optimization) run can be accessed in current dir or
@@ -115,7 +115,7 @@ class JWriteScanVaspStaticFromPrev(FiretaskBase):
 
 
 @explicit_serialize
-class JWriteMVLGWFromPrev(FiretaskBase):
+class WriteMVLGWFromPrev(FiretaskBase):
     """
     Writes input files for a static run. Assumes that output files from a
     previous (e.g., optimization) run can be accessed in current dir or
@@ -174,7 +174,7 @@ class JWriteMVLGWFromPrev(FiretaskBase):
         vis.write_input(".")
 
 @explicit_serialize
-class JFileTransferTask(FiretaskBase):
+class FileTransferTask(FiretaskBase):
     """
     A Firetask to Transfer files.
 
@@ -301,7 +301,7 @@ class JFileTransferTask(FiretaskBase):
             return True
 
 @explicit_serialize
-class JWriteInputsFromDB(FiretaskBase):
+class WriteInputsFromDB(FiretaskBase):
     """
     A Firetask to write files:
     Required params:

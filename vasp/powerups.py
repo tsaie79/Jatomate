@@ -1,10 +1,8 @@
-from .firetasks.firetasks import WriteTwoDBSKpoints
+from .firetasks.firetasks import WriteTwoDBSKpoints, FileTransferTask, WriteInputsFromDB
 from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
     VDW_KERNEL_DIR
 )
-
-from atomate.vasp.firetasks.jcustom import JFileTransferTask, JWriteInputsFromDB
 from atomate.vasp.firetasks.glue_tasks import CopyFiles
 from atomate.vasp.firetasks.write_inputs import ModifyIncar, WriteVaspFromPMGObjects
 
@@ -39,7 +37,7 @@ def scp_files(
         task_name_constraint=task_name_constraint,
     )
     for idx_fw, idx_t in idx_list:
-        original_wf.fws[idx_fw].tasks.insert(idx_t + 1, JFileTransferTask(
+        original_wf.fws[idx_fw].tasks.insert(idx_t + 1, FileTransferTask(
             mode="rtransfer",
             files=["all"],
             dest=dest,
@@ -57,7 +55,7 @@ def write_inputs_from_db(original_wf, db_file, task_id, modify_incar, write_chgc
         task_name_constraint="RunVasp",
     )
     for idx_fw, idx_t in idx_list:
-        original_wf.fws[idx_fw].tasks.insert(idx_t - 1, JWriteInputsFromDB(db_file=db_file, task_id=task_id,
+        original_wf.fws[idx_fw].tasks.insert(idx_t - 1, WriteInputsFromDB(db_file=db_file, task_id=task_id,
                                                                            write_chgcar=write_chgcar,
                                                                            modify_incar=modify_incar))
     return original_wf
