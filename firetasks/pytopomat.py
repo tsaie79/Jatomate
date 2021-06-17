@@ -216,7 +216,6 @@ class IRVSPToDb(FiretaskBase):
     optional_params = ["db_file", "additional_fields", "collection_name"]
 
     def run_task(self, fw_spec):
-        print(fw_spec["irvsp_out"])
         irvsp = self.get("irvsp_out") or fw_spec["irvsp_out"]
 
         irvsp = jsanitize(irvsp)
