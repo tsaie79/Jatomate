@@ -64,7 +64,7 @@ class IrvspFW(Firework):
             t.append(
                 CopyVaspOutputs(
                     calc_dir=prev_calc_dir,
-                    additional_files=["CHGCAR", "WAVECAR"],
+                    additional_files=["WAVECAR"],
                     contcar_to_poscar=True,
                 )
             )
@@ -72,7 +72,7 @@ class IrvspFW(Firework):
             t.append(
                 CopyVaspOutputs(
                     calc_loc=True,
-                    additional_files=["CHGCAR", "WAVECAR"],
+                    additional_files=["WAVECAR"],
                     contcar_to_poscar=True,
                 )
             )
