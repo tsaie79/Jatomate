@@ -12,7 +12,7 @@ fireworks:
         LCHARG: False
         LWAVE: False
         NSW: 150
-    job_type: normal
+    job_type: double_relaxation_run
     max_force_threshold: False
     vasptodb_kwargs:
       additional_fields:
