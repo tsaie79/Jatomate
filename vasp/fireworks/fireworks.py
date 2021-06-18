@@ -431,9 +431,9 @@ class ScanStaticFW(Firework):
 
         t.append(RmSelectiveDynPoscar())
 
-        # magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
-        # if magmom:
-        #     t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
+        magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
+        if magmom:
+            t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
 
         t.append(ModifyIncar(incar_update={"EDIFF": 1E-5}))
 
