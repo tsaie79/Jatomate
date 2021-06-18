@@ -334,6 +334,7 @@ class WriteInputsFromDB(FiretaskBase):
 
 @explicit_serialize
 class WriteTwoDBSKpoints(FiretaskBase):
+    required_params = ["is_hse"]
     optional_params = ["added_kpoints", "reciprocal_density", "kpoints_line_density", "mode"]
     def run_task(self, fw_spec):
                  #structure, added_kpoints=None, reciprocal_density=50, kpoints_line_density=20, mode="line")
@@ -357,12 +358,14 @@ class WriteTwoDBSKpoints(FiretaskBase):
         ir_kpts = SpacegroupAnalyzer(structure, symprec=0.1).get_ir_reciprocal_mesh(
             grid[0]
         )
-        for k in ir_kpts:
-            if round(k[0][2], 1) != 0:
-                continue
-            kpts.append(k[0])
-            weights.append(int(k[1]))
-            all_labels.append(None)
+        if self["is_hse"]:
+            for k in ir_kpts:
+                if round(k[0][2], 1) != 0:
+                    continue
+                kpts.append(k[0])
+                weights.append(int(k[1]))
+                all_labels.append(None)
+
 
         # for both modes, include any user-added kpoints w/zero weight
         for k in added_kpoints:
@@ -386,22 +389,36 @@ class WriteTwoDBSKpoints(FiretaskBase):
 
             for k, f in enumerate(frac_k_points):
                 kpts.append(f)
-                weights.append(0.0)
+                weights.append(0.0) if self["is_hse"] else weights.append(1.0)
                 all_labels.append(labels[k])
 
+            style = Kpoints.supported_modes.Reciprocal
+            num_kpts = len(kpts)
+            kpts = kpts
+            kpts_weights = weights
+            labels = all_labels
+
+        elif not self["is_hse"] and mode == "uniform":
+            style = Kpoints.supported_modes.Gamma
+            num_kpts = 0
+            kpts = grid
+            kpts_weights = None
+            labels = None
+
+
         comment = (
-            "HSE run along symmetry lines"
+            "is_HSE={} run along symmetry lines".format(self["is_hse"])
             if mode.lower() == "line"
-            else "HSE run on uniform grid"
+            else "is_HSE={} run on uniform grid".format(self["is_hse"])
         )
 
         Kpoints(
             comment=comment,
-            style=Kpoints.supported_modes.Reciprocal,
-            num_kpts=len(kpts),
+            style=style,
+            num_kpts=num_kpts,
             kpts=kpts,
-            kpts_weights=weights,
-            labels=all_labels,
+            kpts_weights=kpts_weights,
+            labels=labels,
         ).write_file("KPOINTS")
 
 
