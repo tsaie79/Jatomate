@@ -333,7 +333,7 @@ class WriteInputsFromDB(FiretaskBase):
             chgcar.write_file(os.path.join(pth, "CHGCAR"))
 
 @explicit_serialize
-class WriteTwoDBSKpoints(FiretaskBase):
+class Write2dNSCFKpoints(FiretaskBase):
     required_params = ["is_hse"]
     optional_params = ["added_kpoints", "reciprocal_density", "kpoints_line_density", "mode"]
     def run_task(self, fw_spec):

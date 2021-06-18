@@ -1,4 +1,4 @@
-from .firetasks.firetasks import WriteTwoDBSKpoints, FileTransferTask, WriteInputsFromDB
+from .firetasks.firetasks import Write2dNSCFKpoints, FileTransferTask, WriteInputsFromDB
 from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
     VDW_KERNEL_DIR
@@ -211,8 +211,8 @@ def cp_vasp_from_prev(original_wf, vasp_io, fw_name_constraint=None):
             original_wf.fws[idx_fw].tasks[idx_t].update({"additional_files": vasp_io})
     return original_wf
 
-def add_modify_twod_bs_kpoints(
-        original_wf, modify_kpoints_params=None, fw_name_constraint=None
+def add_modify_2d_nscf_kpoints(
+        original_wf, is_hse=False, modify_kpoints_params=None, fw_name_constraint=None
 ):
     """
     Every FireWork that runs VASP has a ModifyKpoints task just beforehand. For
@@ -240,6 +240,6 @@ def add_modify_twod_bs_kpoints(
     for idx_fw, idx_t in idx_list:
         original_wf.fws[idx_fw].tasks.insert(
             idx_t,
-            WriteTwoDBSKpoints(**modify_kpoints_params)
+            Write2dNSCFKpoints(is_hse=is_hse, **modify_kpoints_params)
         )
     return original_wf
