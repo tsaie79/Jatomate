@@ -268,7 +268,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
     return wf
 
 
-def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupdowns, task, category,
+def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupdowns, task,
                      vasptodb=None, wf_addition_name=None, wf_yaml=None):
 
     encut = 1.3*max([potcar.enmax for potcar in MPScanRelaxSet(structure).potcar])
@@ -340,9 +340,6 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
 
     wf_name = "{}:{}:q{}:sp{}".format("".join(structure.formula.split(" ")), wf_addition_name, charge_states, nupdowns)
     wf = Workflow(fws, name=wf_name)
-    wf = set_execution_options(wf, category=category)
-    wf = preserve_fworker(wf)
     wf = add_namefile(wf)
-    wf = add_modify_incar(wf)
     return wf
 
