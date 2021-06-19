@@ -318,7 +318,7 @@ def get_wf_full_scan(structure, charge_states, gamma_only, gamma_mesh, dos, nupd
         uis = {
             "user_incar_settings": {
                 "ENCUT": encut,
-                "NUPDOWN": (None if nupdown==-1 else nupdown),
+                "NUPDOWN": nupdown,
                 "NELECT": nelect
             },
             "user_kpoints_settings": user_kpoints_settings
