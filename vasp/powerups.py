@@ -22,6 +22,10 @@ def scp_files(
     """
     SCP ALL files to local computer
 
+    Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
+    then, it must already have successful scp from login to local computer, i.e.
+    in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
     Args:
         original_wf (Workflow)
         dest (str): "/home/jengyuantsai/test_scp_fw/defect_db/binary_vac_AB/" (make sure every folder exists)
