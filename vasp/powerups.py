@@ -16,7 +16,7 @@ __email__ = "tsaie79@gmail.com"
 def scp_files(
         original_wf,
         dest,
-        port,
+        port=12346,
         fw_name_constraint=None,
         task_name_constraint="VaspToDb",
 ):
@@ -26,6 +26,9 @@ def scp_files(
     Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
     then, it must already have successful scp from login to local computer, i.e.
     in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
+    db0 port = 12346
+    db1 port = 12348
 
     Args:
         original_wf (Workflow)
