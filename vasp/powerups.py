@@ -16,6 +16,7 @@ __email__ = "tsaie79@gmail.com"
 def scp_files(
         original_wf,
         dest,
+        port,
         fw_name_constraint=None,
         task_name_constraint="VaspToDb",
 ):
@@ -46,7 +47,8 @@ def scp_files(
             files=["all"],
             dest=dest,
             server="localhost",
-            user="jengyuantsai"
+            user="jengyuantsai",
+            port=port
         ))
 
     return original_wf

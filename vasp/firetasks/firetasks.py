@@ -195,7 +195,7 @@ class FileTransferTask(FiretaskBase):
         - max_retry: (int) number of times to retry failed transfers; defaults to `0` (no retries)
         - retry_delay: (int) number of seconds to wait between retries; defaults to `10`
     """
-    required_params = ["mode", "files", "dest"]
+    required_params = ["mode", "files", "dest", "port"]
     optional_params = ["server", "user", "key_filename", "max_retry", "retry_delay"]
 
     fn_list = {
@@ -224,7 +224,7 @@ class FileTransferTask(FiretaskBase):
             # ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
             ssh.load_system_host_keys()
             ssh.connect(self['server'], username=self.get('user'),
-                        key_filename=os.path.expanduser(os.path.join("~", ".ssh", "id_rsa")), port=12346)
+                        key_filename=os.path.expanduser(os.path.join("~", ".ssh", "id_rsa")), port=self["port"])
             sftp = ssh.open_sftp()
 
         for f in self["files"]:
