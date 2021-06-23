@@ -1,3 +1,5 @@
+import subprocess
+
 from fireworks import FiretaskBase, explicit_serialize
 
 from pymatgen.io.vasp.inputs import *
@@ -227,6 +229,7 @@ class FileTransferTask(FiretaskBase):
                         key_filename=os.path.expanduser(os.path.join("~", ".ssh", "id_rsa")), port=self["port"])
             sftp = ssh.open_sftp()
 
+
         for f in self["files"]:
             try:
                 if "all" == f:
@@ -299,6 +302,33 @@ class FileTransferTask(FiretaskBase):
             raise
         else:
             return True
+
+@explicit_serialize
+class FileSCPTask(FiretaskBase):
+    """
+    A Firetask to Transfer files.
+    Simply using bash command SCP
+
+    Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
+    then, it must already have successful scp from login to local computer, i.e.
+    in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
+    Required params:
+        port: tunnel port
+        user: user name of local workstation
+        dest: absolute path in local workstation
+    """
+    required_params = ["port", "user", "dest"]
+
+    def run_task(self, fw_spec):
+        cmd = "scp -P {} -r {} {}@localhost:{}".format(
+            self["port"],
+            os.getcwd(),
+            self["user"],
+            self["dest"]
+        )
+        subprocess.call(cmd.split(" "))
+
 
 @explicit_serialize
 class WriteInputsFromDB(FiretaskBase):
