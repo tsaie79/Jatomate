@@ -426,10 +426,9 @@ class Write2dNSCFKpoints(FiretaskBase):
             num_kpts = len(kpts)
             from unfold import removeDuplicateKpoints
             kpts, kpt_ids = removeDuplicateKpoints(kpts, return_map=True)
-            weights = [weights[kpt_idx] for kpt_idx in kpt_ids]
             kpts = kpts
-            kpts_weights = weights
-            labels = all_labels
+            kpts_weights = [weights[kpt_idx] for kpt_idx in kpt_ids]
+            labels = [all_labels[kpt_idx] for kpt_idx in kpt_ids]
 
         elif not self["is_hse"] and mode == "uniform":
             style = Kpoints.supported_modes.Gamma
