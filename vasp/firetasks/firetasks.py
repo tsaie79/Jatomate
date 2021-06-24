@@ -423,11 +423,13 @@ class Write2dNSCFKpoints(FiretaskBase):
                 all_labels.append(labels[k])
 
             style = Kpoints.supported_modes.Reciprocal
-            # from unfold import removeDuplicateKpoints
-            # kpts, kpt_ids = removeDuplicateKpoints(kpts, return_map=True)
+
+            from unfold import removeDuplicateKpoints
+            kpts, kpt_ids = removeDuplicateKpoints(kpts, return_map=True)
+
             kpts = kpts
-            kpts_weights = weights#[weights[kpt_idx] for kpt_idx in list(dict.fromkeys(kpt_ids))]
-            labels = all_labels#[all_labels[kpt_idx] for kpt_idx in list(dict.fromkeys(kpt_ids))]
+            kpts_weights = [weights[kpt_ids.index(idx)] for idx in range(len(kpts))]
+            labels = [all_labels[kpt_ids.index(idx)] for idx in range(len(kpts))]
             num_kpts = len(kpts)
 
         elif not self["is_hse"] and mode == "uniform":
