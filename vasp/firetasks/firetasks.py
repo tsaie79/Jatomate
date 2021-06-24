@@ -428,8 +428,8 @@ class Write2dNSCFKpoints(FiretaskBase):
             kpts, kpt_ids = removeDuplicateKpoints(kpts, return_map=True)
 
             kpts = kpts
-            kpts_weights = [weights[kpt_ids.index(idx)] for idx in range(len(kpts))]
-            labels = [all_labels[kpt_ids.index(idx)] for idx in range(len(kpts))]
+            kpts_weights = [weights[list(kpt_ids).index(idx)] for idx in range(len(kpts))]
+            labels = [all_labels[list(kpt_ids).index(idx)] for idx in range(len(kpts))]
             num_kpts = len(kpts)
 
         elif not self["is_hse"] and mode == "uniform":
