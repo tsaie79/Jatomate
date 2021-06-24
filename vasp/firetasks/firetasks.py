@@ -426,8 +426,8 @@ class Write2dNSCFKpoints(FiretaskBase):
             from unfold import removeDuplicateKpoints
             kpts, kpt_ids = removeDuplicateKpoints(kpts, return_map=True)
             kpts = kpts
-            kpts_weights = [weights[kpt_idx] for kpt_idx in kpt_ids]
-            labels = [all_labels[kpt_idx] for kpt_idx in kpt_ids]
+            kpts_weights = [weights[kpt_idx] for kpt_idx in list(dict.fromkeys(kpt_ids))]
+            labels = [all_labels[kpt_idx] for kpt_idx in list(dict.fromkeys(kpt_ids))]
             num_kpts = len(kpts)
 
         elif not self["is_hse"] and mode == "uniform":
