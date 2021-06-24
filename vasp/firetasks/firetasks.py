@@ -424,6 +424,9 @@ class Write2dNSCFKpoints(FiretaskBase):
 
             style = Kpoints.supported_modes.Reciprocal
             num_kpts = len(kpts)
+            from unfold import removeDuplicateKpoints
+            kpts, kpt_ids = removeDuplicateKpoints(kpts, return_map=True)
+            weights = [weights[kpt_idx] for kpt_idx in kpt_ids]
             kpts = kpts
             kpts_weights = weights
             labels = all_labels
