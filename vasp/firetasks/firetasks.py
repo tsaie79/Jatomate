@@ -426,9 +426,6 @@ class Write2dNSCFKpoints(FiretaskBase):
             kpts = kpts
             kpts_weights = weights
             labels = all_labels
-
-            for label in labels:
-                i
             num_kpts = len(kpts)
 
         elif not self["is_hse"] and mode == "uniform":
