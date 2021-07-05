@@ -29,46 +29,47 @@ def rerun_relax(fworker):
     from pymatgen.io.vasp.inputs import Structure
     from pymatgen.io.vasp.outputs import Oszicar
 
-    def delet_dir(fw):
-        dir_name = lpad.get_launchdir(fw.fw_id)
-        shutil.rmtree(dir_name)
-    def rerun_opt(fw): #421
-        # for f in glob("POSCAR*"):
-        #     os.remove(f)
-        # subprocess.call("gunzip OUTCAR.gz CONTCAR.gz".split(" "))
-        # st = Structure.from_file("CONTCAR")
-        # fw.tasks[0].update({"structure": st})
-        fw.spec["_queueadapter"].update({"walltime": "06:00:00"})
-        fw.tasks[2]["incar_update"].update({"ISPIN": 1})
-        lpad.rerun_fw(fw.fw_id)
-        lpad.update_spec([fw.fw_id], fw.as_dict()["spec"])
-        # subprocess.call("qlaunch -c {} -r singleshot -f {}".format(
-        #     os.path.join(os.path.expanduser("~"), "config/project/Scan2dMat/calc_data/"), fw.fw_id).split(" "))
-
     lpad = LaunchPad.from_file(
         os.path.join(os.path.expanduser("~"), "config/project/Scan2dMat/calc_data/my_launchpad.yaml"))
 
+    def delet_dir(dir_name):
+        shutil.rmtree(dir_name)
+    def rerun_opt(fw_id): #421
+        # for f in glob("POSCAR*"):
+        #     os.remove(f)
+        lpad.rerun_fw(fw_id)
+        fw = lpad.get_fw_by_id(fw_id)
+        fw.spec['_queueadapter'] = {'walltime': '06:00:00'}
+        fw.tasks[1]["other_params"]["user_incar_settings"].update({"ALGO":"All"})
+        # fw.tasks[1]["incar_update"].update({"ALGO": "All"})
+        lpad.update_spec([fw.fw_id], fw.as_dict()["spec"])
+        # shutil.copy("CONTCAR", "POSCAR")
+        subprocess.call("qlaunch -c {} -r singleshot -f {}".format(
+            os.path.join(os.path.expanduser("~"), "config/project/Scan2dMat/calc_data/"), fw.fw_id).split(" "))
+
+
+
     fws = lpad.get_fw_ids(
         {
-            "state": {"$in": ["FIZZLED"]}, #First running, then fizzled
-            "name": {"$regex": "SCAN_relax pos"},
+            "state": {"$in": ["RUNNING"]}, #First running, then fizzled
+            "name": {"$regex": "SCAN_nscf line"},
             "spec._fworker": fworker,
-            # "fw_id": {"$nin": [1896, 2160, 2172, 2484, 138]}
+            # "fw_id": {"$nin": [1751, 1763, 2003, 2051]}
             # "fw_id": 2550
         }
     )
     a = []
     for fw_id in fws:
-        fw = lpad.get_fw_by_id(fw_id)
-        fworker = fw.spec["_fworker"]
-        path = lpad.get_launchdir(fw_id)
-        # os.chdir(path)
+        prev_fw = lpad.get_fw_by_id(fw_id)
+        fworker = prev_fw.spec["_fworker"]
+        prev_path = lpad.get_launchdir(fw_id)
+        # os.chdir(prev_path)
         # a.append(fw_id)
         # if glob("CONTCAR.relax*") != []:
         try:
-            print(fw_id, fworker, path, fw.name)
-            rerun_opt(fw)
-            # delet_dir(fw)
+            print(fw_id, fworker, prev_path, prev_fw.name)
+            # delet_dir(prev_path)
+            rerun_opt(fw_id)
         except Exception as err:
             print(err)
             continue
@@ -83,7 +84,7 @@ def rerun_relax(fworker):
         #     # rerun_opt(fw)
     print(a, len(a))
 
-rerun_relax("owls")
+rerun_relax("efrc")
 
 #%%
 def rerun_irvsp():
@@ -104,6 +105,33 @@ def rerun_irvsp():
         lpad.update_spec([fw.fw_id], fw.as_dict()["spec"])
         subprocess.call("qlaunch -c {} -r singleshot -f {}".format(
             os.path.join(os.path.expanduser("~"), "config/project/Scan2dMat/calc_data/"), fw_id).split(" "))
+
+#%%
+from fireworks import LaunchPad
+import os
+lpad = LaunchPad.from_file(
+    os.path.join(os.path.expanduser("~"), "config/project/Scan2dMat/calc_data/my_launchpad.yaml"))
+for i in lpad.get_wf_ids({"state": "COMPLETED"}):
+    try:
+        fw = lpad.get_fw_by_id(i)
+        if fw.spec["_fworker"] == "owls":
+            print(i, fw.spec["_fworker"])
+            lpad.delete_wf(i, True)
+    except Exception:
+            continue
+#%%
+from fireworks import LaunchPad
+import os
+lpad = LaunchPad.from_file(
+    os.path.join(os.path.expanduser("~"), "config/project/Scan2dMat/calc_data/my_launchpad.yaml"))
+
+for i in lpad.get_wf_ids({"state": "READY"})[:10]:
+    wf = lpad.get_wf_by_fw_id(i)
+    for fw in wf.fws:
+        if fw.spec["_fworker"] == "owls":
+            fw.spec["_fworker"] = "efrc"
+            lpad.update_spec([fw.fw_id], fw.as_dict()["spec"])
+
 
 
 
