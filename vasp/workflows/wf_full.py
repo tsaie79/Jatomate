@@ -287,7 +287,7 @@ def get_wf_full_scan(structure, charge_states, gamma_only, dos, nupdowns,
         if gamma_only is True:
             kpt = Kpoints.gamma_automatic()
             user_kpoints_settings = kpt.__dict__
-            user_kpoints_settings.update({"style", "G"})
+            user_kpoints_settings.update({"style": "G"})
             user_kpoints_settings.pop("_style")
             # user_kpoints_settings = MPRelaxSet(structure).kpoints
 
