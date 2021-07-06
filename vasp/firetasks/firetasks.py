@@ -327,7 +327,11 @@ class FileSCPTask(FiretaskBase):
             self["user"],
             self["dest"]
         )
-        subprocess.call(cmd.split(" "))
+        try:
+            subprocess.check_output(cmd.split(" "))
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            raise BaseException(e.output)
 
 
 @explicit_serialize
