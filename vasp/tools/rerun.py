@@ -110,11 +110,11 @@ def rerun_irvsp():
 from fireworks import LaunchPad
 import os
 lpad = LaunchPad.from_file(
-    os.path.join(os.path.expanduser("~"), "config/project/Scan2dMat/calc_data/my_launchpad.yaml"))
+    os.path.join(os.path.expanduser("~"), "config/project/Scan2dDefect/calc_data/my_launchpad.yaml"))
 for i in lpad.get_wf_ids({"state": "COMPLETED"}):
     try:
         fw = lpad.get_fw_by_id(i)
-        if fw.spec["_fworker"] == "owls":
+        if fw.spec["_fworker"] == "efrc":
             print(i, fw.spec["_fworker"])
             lpad.delete_wf(i, True)
     except Exception:
