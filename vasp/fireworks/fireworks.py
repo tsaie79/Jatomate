@@ -28,6 +28,7 @@ from atomate.vasp.firetasks.write_inputs import (
     WriteVaspFromIOSet,
     WriteVaspFromPMGObjects,
     WriteVaspStaticFromPrev,
+    WriteVaspSOCFromPrev,
     ModifyIncar
 )
 from atomate.vasp.config import VASP_CMD, DB_FILE
