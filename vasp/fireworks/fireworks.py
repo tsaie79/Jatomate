@@ -27,7 +27,6 @@ from atomate.vasp.firetasks.run_calc import (
 from atomate.vasp.firetasks.write_inputs import (
     WriteVaspFromIOSet,
     WriteVaspFromPMGObjects,
-    WriteVaspSOCFromPrev,
     WriteVaspStaticFromPrev,
     ModifyIncar
 )
