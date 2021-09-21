@@ -3,7 +3,7 @@ import subprocess
 from fireworks import FiretaskBase, explicit_serialize
 
 from pymatgen.io.vasp.inputs import *
-from pymatgen.io.vasp.sets import MPStaticSet, MVLGWSet, MPHSEBSSet
+from pymatgen.io.vasp.sets import MPStaticSet, MVLGWSet, MPHSEBSSet, MPSOCSet
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 from pymatgen.symmetry.bandstructure import HighSymmKpath
 
