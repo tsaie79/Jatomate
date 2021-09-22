@@ -239,7 +239,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
             fws.append(hse_scf(parents=None))
             fws.append(hse_bs(parents=fws[-1], **task_arg))
         elif task == "hse_scf-hse_soc":
-            fws.append(hse_scf(parents=None, lcharge=True, **task_arg))
+            fws.append(hse_scf(parents=None, lcharg=True, **task_arg))
             fws.append(hse_soc(parents=fws[-1]))
         elif task == "hse_relax-hse_scf":
             fws.append(hse_relax(parents=None))
@@ -250,11 +250,11 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
             fws.append(hse_scf(parents=fws[-1], **task_arg))
         elif task == "hse_relax-hse_scf-hse_bs":
             fws.append(hse_relax(parents=None))
-            fws.append(hse_scf(parents=fws[-1], lcharge=True))
+            fws.append(hse_scf(parents=fws[-1], lcharg=True))
             fws.append(hse_bs(parents=fws[-1], **task_arg))
         elif task == "hse_relax-hse_scf-hse_soc":
             fws.append(hse_relax(parents=None))
-            fws.append(hse_scf(parents=fws[-1], lcharge=True, **task_arg))
+            fws.append(hse_scf(parents=fws[-1], lcharg=True, **task_arg))
             if "metadata_to_pass" in task_arg:
                 metadata_from_scf = task_arg["metadata_to_pass"]
             else:
@@ -263,7 +263,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
         elif task == "opt-hse_relax-hse_scf-hse_bs":
             fws.append(opt)
             fws.append(hse_relax(parents=fws[-1]))
-            fws.append(hse_scf(parents=fws[-1], lcharge=True))
+            fws.append(hse_scf(parents=fws[-1], lcharg=True))
             fws.append(hse_bs(parents=fws[-1], **task_arg))
 
 
