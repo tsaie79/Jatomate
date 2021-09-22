@@ -295,3 +295,23 @@ def add_modify_2d_nscf_kpoints(
             Write2dNSCFKpoints(is_hse=is_hse, **modify_kpoints_params)
         )
     return original_wf
+
+def add_additional_fields_to_taskdocs(
+        original_wf, update_dict=None, fw_name_constraint=None, task_name_constraint="VaspToDb"):
+    """
+    For all VaspToDbTasks in a given workflow, add information  to
+    "additional_fields" to be placed in the task doc.
+
+    Args:
+        original_wf (Workflow)
+        update_dict (Dict): dictionary to add additional_fields
+        task_name_constraint (str): name of the Firetasks to be modified.
+
+    Returns:
+       Workflow
+    """
+    idx_list = get_fws_and_tasks(original_wf, task_name_constraint=task_name_constraint,
+                                 fw_name_constraint=fw_name_constraint)
+    for idx_fw, idx_t in idx_list:
+        original_wf.fws[idx_fw].tasks[idx_t]["additional_fields"].update(update_dict)
+    return original_wf

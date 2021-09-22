@@ -20,7 +20,6 @@ from atomate.vasp.config import (
     RELAX_MAX_FORCE,
 )
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
-from atomate.vasp.firetasks.parse_outputs import VaspToDb
 from atomate.vasp.firetasks.run_calc import (
     RunVaspCustodian,
 )

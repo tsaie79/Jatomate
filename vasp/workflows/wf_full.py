@@ -138,7 +138,8 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
 
         uis_hse_scf["user_incar_settings"].update({"NELECT": nelect})
 
-        def hse_scf(parents, prev_calc_dir=None, lcharg=False, parse_dos=True, parse_eigenvalues=True):
+        def hse_scf(parents, prev_calc_dir=None, lcharg=False, parse_dos=True, parse_eigenvalues=True,
+                    metadata_to_pass=None):
 
             bandstructure_mode = None
             if parse_dos:
@@ -149,6 +150,8 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
 
             if lcharg:
                 uis_hse_scf["user_incar_settings"].update({"LCHARG":True})
+
+
 
             fw = JHSEStaticFW(
                 structure,
@@ -165,13 +168,15 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
                     },
                     "parse_dos": parse_dos,
                     "parse_eigenvalues": parse_eigenvalues,
-                    "bandstructure_mode": bandstructure_mode
-                }
+                    "bandstructure_mode": bandstructure_mode,
+                    "task_fields_to_push": metadata_to_pass
+                },
             )
             return fw
 
         def hse_soc(parents, prev_calc_dir=None, parse_dos=True,
-                    parse_eigenvalues=True, read_chgcar=True, read_wavecar=True, saxis=(0,0,1)):
+                    parse_eigenvalues=True, read_chgcar=True, read_wavecar=True, saxis=(0,0,1),
+                    metadata_from_scf=None):
 
             if parse_dos:
                 uis_hse_scf["user_incar_settings"].update({"ENMAX": 10, "ENMIN": -10, "NEDOS": 9000})
@@ -192,10 +197,10 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
                         "charge_state": cs,
                         "nupdown_set": nupdown
                     },
-
                     "parse_dos": parse_dos,
                     "parse_eigenvalues": parse_eigenvalues,
-                    "bandstructure_mode": bandstructure_mode
+                    "bandstructure_mode": bandstructure_mode,
+                    "fw_spec_field": list(metadata_from_scf.keys()) if metadata_from_scf else []
                 }
             )
             return fw
@@ -249,8 +254,12 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
             fws.append(hse_bs(parents=fws[-1], **task_arg))
         elif task == "hse_relax-hse_scf-hse_soc":
             fws.append(hse_relax(parents=None))
-            fws.append(hse_scf(parents=fws[-1], lcharge=True))
-            fws.append(hse_soc(parents=fws[-1]))
+            fws.append(hse_scf(parents=fws[-1], lcharge=True, **task_arg))
+            if "metadata_to_pass" in task_arg:
+                metadata_from_scf = task_arg["metadata_to_pass"]
+            else:
+                metadata_from_scf = None
+            fws.append(hse_soc(parents=fws[-1], metadata_from_scf=metadata_from_scf))
         elif task == "opt-hse_relax-hse_scf-hse_bs":
             fws.append(opt)
             fws.append(hse_relax(parents=fws[-1]))
