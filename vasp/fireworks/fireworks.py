@@ -641,7 +641,7 @@ class JHSERelaxFW(Firework):
             vasptodb_kwargs=None,
             parents=None,
             force_gamma=True,
-            job_type="normal",
+            job_type="double_relaxation_run",
             max_force_threshold=False,
             ediffg=None,
             auto_npar=">>auto_npar<<",
