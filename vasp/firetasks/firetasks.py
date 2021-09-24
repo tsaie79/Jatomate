@@ -571,6 +571,7 @@ class VaspToDb(FiretaskBase):
         if self.get("fw_spec_field") and isinstance(self.get("fw_spec_field"), list):
             for key in self.get("fw_spec_field"):
                 task_doc.update({key: fw_spec[key]})
+        # Automatically add prev fws information
         for prev_info_key in ["prev_fw_taskid", "prev_fw_db", "prev_fw_collection"]:
             if prev_info_key in fw_spec.keys():
                 task_doc.update({prev_info_key: fw_spec[prev_info_key]})
@@ -584,6 +585,7 @@ class VaspToDb(FiretaskBase):
                 f.write(json.dumps(task_doc, default=DATETIME_HANDLER))
         else:
             mmdb = VaspCalcDb.from_db_file(db_file, admin=True)
+            # Add current entry information
             task_doc.update({"db": mmdb.db_name, "collection": mmdb.collection.name})
             t_id = mmdb.insert_task(
                 task_doc, use_gridfs=bool(self.get("parse_dos", False))
