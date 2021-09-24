@@ -573,7 +573,7 @@ class VaspToDb(FiretaskBase):
                 task_doc.update({key: fw_spec[key]})
         # Automatically add prev fws information
         for prev_info_key in ["prev_fw_taskid", "prev_fw_db", "prev_fw_collection"]:
-            if prev_info_key in fw_spec.keys():
+            if prev_info_key in fw_spec:
                 task_doc.update({prev_info_key: fw_spec[prev_info_key]})
 
         # get the database connection
