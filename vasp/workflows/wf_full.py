@@ -335,7 +335,7 @@ def get_wf_full_scan(structure, charge_states, gamma_only, dos, nupdowns,
             },
             "user_kpoints_settings": user_kpoints_settings
         }
-        print(os.path.dirname(os.path.abspath(__file__)))
+        
         wf_yaml = wf_yaml if wf_yaml else os.path.join(os.path.dirname(os.path.abspath(__file__)), "general/scan.yaml")
         wf = get_wf(structure, wf_yaml)
         if dos:
