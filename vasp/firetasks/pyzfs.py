@@ -84,28 +84,4 @@ class PyzfsToDb(FiretaskBase):
             t_id = db.insert(d)
             logger.info("Pyzfs calculation complete.")
 
-        task_fields_to_push = self.get("task_fields_to_push", {})
-        # pass entry information
-        task_fields_to_push.update(
-            {
-                "prev_fw_taskid": "task_id",
-                "prev_fw_db": "db",
-                "prev_fw_collection": "collection"
-            }
-        )
-
-        update_spec = {}
-        if task_fields_to_push:
-            if isinstance(task_fields_to_push, dict):
-                for key, path_in_task_doc in task_fields_to_push.items():
-                    if has(d, path_in_task_doc):
-                        update_spec[key] = get(d, path_in_task_doc)
-                    else:
-                        logger.warning(
-                            "Could not find {} in task document. Unable to push to next firetask/firework".format(path_in_task_doc))
-            else:
-                raise RuntimeError("Inappropriate type {} for task_fields_to_push. It must be a "
-                                   "dictionary of format: {key: path} where key refers to a field "
-                                   "in the spec and path is a full mongo-style path to a "
-                                   "field in the task document".format(type(task_fields_to_push)))
         return FWAction()
