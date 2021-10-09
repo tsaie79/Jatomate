@@ -252,7 +252,7 @@ class IRVSPToDb(FiretaskBase):
             t_id = db.insert(d)
             logger.info("IRVSP calculation complete.")
 
-        task_fields_to_push = self.get("task_fields_to_push", {})
+        task_fields_to_push = self.get("task_fields_to_push", {}) or {}
         # pass entry information
         task_fields_to_push.update(
             {
