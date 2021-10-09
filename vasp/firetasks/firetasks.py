@@ -613,7 +613,7 @@ class VaspToDb(FiretaskBase):
                 raise RuntimeError("Unknown option for defuse_unsuccessful: "
                                    "{}".format(defuse_unsuccessful))
 
-        task_fields_to_push = self.get("task_fields_to_push", {})
+        task_fields_to_push = self.get("task_fields_to_push", {}) or {}
         # pass entry information
         task_fields_to_push.update(
             {
