@@ -35,10 +35,11 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
             "ENCUT": encut,
             "ISIF": 2,
             "ISMEAR": 0,
-            "EDIFFG": -0.01,
+            "EDIFF": 1e-5,
+            "EDIFFG": -0.02,
             "LCHARG": False,
             "NUPDOWN": nupdown,
-            "SIGMA": 0.001,
+            "SIGMA": 0.01,
             "NSW": 150
             #"NCORE": 4 owls normal 14; cori 8. Reduce ncore if want to increase speed but low memory risk
         }
@@ -80,7 +81,8 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
             structure=structure,
             name="PBE_relax",
             max_force_threshold=False,
-            job_type="normal",
+            job_type="double_relaxation_run",
+            ediffg=-0.01,
             force_gamma=gamma_mesh,
             vasptodb_kwargs={
                 "parse_dos": False,
