@@ -341,6 +341,35 @@ class FileSCPTask(FiretaskBase):
             print(e.output)
             raise BaseException(e.output)
 
+@explicit_serialize
+class CopyFileSCPTask(FiretaskBase):
+    """
+    A Firetask to Transfer files.
+    Simply using bash command SCP
+
+    Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
+    then, it must already have successful scp from login to local computer, i.e.
+    in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
+    Required params:
+        port: tunnel port
+        user: user name of local workstation
+        dest: absolute path in local workstation
+    """
+    required_params = ["port", "user", "from"]
+
+    def run_task(self, fw_spec):
+        cmd = "scp -P {} -r {}@localhost:{} {}".format(
+            self["port"],
+            self["user"],
+            self["from"],
+            os.getcwd(),
+        )
+        try:
+            subprocess.check_output(cmd.split(" "))
+        except subprocess.CalledProcessError as e:
+            print(e.output)
+            raise BaseException(e.output)
 
 @explicit_serialize
 class WriteInputsFromDB(FiretaskBase):
