@@ -1,4 +1,4 @@
-from .firetasks.firetasks import Write2dNSCFKpoints, FileTransferTask, WriteInputsFromDB, FileSCPTask
+from .firetasks.firetasks import Write2dNSCFKpoints, FileTransferTask, WriteInputsFromDB, FileSCPTask, CopyFileSCPTask
 from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
     VDW_KERNEL_DIR
@@ -98,6 +98,46 @@ def bash_scp_files(
 
     return original_wf
 
+def bash_scp_copy_files(
+        original_wf,
+        copy_from,
+        port=12346,
+        fw_name_constraint=None,
+        task_name_constraint="VaspToDb",
+):
+    """
+    SCP ALL files to local computer
+
+    Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
+    then, it must already have successful scp from login to local computer, i.e.
+    in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
+    db0 port = 12346
+    db1 port = 12348
+
+    Args:
+        original_wf (Workflow)
+        dest (str): "/home/jengyuantsai/test_scp_fw/defect_db/binary_vac_AB/" (make sure every folder exists)
+        fw_name_constraint (str): pattern for fireworks to clean up files after
+        task_name_constraint (str): pattern for firetask to clean up files
+
+    Returns:
+       Workflow
+    """
+    idx_list = get_fws_and_tasks(
+        original_wf,
+        fw_name_constraint=fw_name_constraint,
+        task_name_constraint=task_name_constraint,
+    )
+    user = "jengyuantsai" if port==12346 else "qimin"
+    for idx_fw, idx_t in idx_list:
+        original_wf.fws[idx_fw].tasks.insert(idx_t + 1, CopyFileSCPTask(
+            port=port,
+            user=user,
+            copy_from=copy_from,
+        ))
+
+    return original_wf
 
 def write_inputs_from_db(original_wf, db_file, task_id, modify_incar, write_chgcar=True, fw_name_constraint=None):
 

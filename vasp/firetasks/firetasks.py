@@ -356,13 +356,13 @@ class CopyFileSCPTask(FiretaskBase):
         user: user name of local workstation
         dest: absolute path in local workstation
     """
-    required_params = ["port", "user", "from"]
+    required_params = ["port", "user", "copy_from"]
 
     def run_task(self, fw_spec):
         cmd = "scp -P {} -r {}@localhost:{} {}".format(
             self["port"],
             self["user"],
-            self["from"],
+            self["copy_from"],
             os.getcwd(),
         )
         try:
