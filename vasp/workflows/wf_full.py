@@ -8,7 +8,6 @@ from atomate.vasp.powerups import *
 from atomate.vasp.workflows.base.core import get_wf
 
 from ..fireworks.fireworks import *
-import my_atomate
 
 from fireworks import Workflow
 
