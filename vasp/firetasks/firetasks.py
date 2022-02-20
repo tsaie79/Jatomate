@@ -469,7 +469,7 @@ class Write2dNSCFKpoints(FiretaskBase):
             labels = all_labels
             num_kpts = len(kpts)
 
-        elif not self["is_hse"] and mode == "uniform":
+        elif mode == "uniform":
             style = Kpoints.supported_modes.Gamma
             num_kpts = 0
             kpts = grid
