@@ -28,7 +28,8 @@ from atomate.vasp.firetasks.write_inputs import (
     WriteVaspFromPMGObjects,
     WriteVaspStaticFromPrev,
     WriteVaspSOCFromPrev,
-    ModifyIncar
+    ModifyIncar,
+    WriteVaspNSCFFromPrev
 )
 from atomate.vasp.config import VASP_CMD, DB_FILE
 
@@ -899,3 +900,93 @@ class HSEBSFW(Firework):
         )
         super(HSEBSFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
 
+
+class NonSCFFW(Firework):
+    def __init__(
+            self,
+            parents=None,
+            prev_calc_dir=None,
+            filesystem=None,
+            port=None,
+            structure=None,
+            name="nscf",
+            mode="uniform",
+            vasp_cmd=VASP_CMD,
+            additional_files=None,
+            db_file=DB_FILE,
+            input_set_overrides=None,
+            **kwargs
+    ):
+        """
+        Standard NonSCF Calculation Firework supporting uniform and line modes.
+
+        Args:
+            structure (Structure): Input structure - used only to set the name
+                of the FW.
+            name (str): Name for the Firework.
+            mode (str): "uniform" or "line" mode.
+            vasp_cmd (str): Command to run vasp.
+            copy_vasp_outputs (bool): Whether to copy outputs from previous
+                run. Defaults to True.
+            prev_calc_dir (str): Path to a previous calculation to copy from
+            db_file (str): Path to file specifying db credentials.
+            parents (Firework): Parents of this particular Firework.
+                FW or list of FWS.
+            input_set_overrides (dict): Arguments passed to the
+                "from_prev_calc" method of the MPNonSCFSet. This parameter
+                allows a user to modify the default values of the input set.
+                For example, passing the key value pair
+                    {'reciprocal_density': 1000}
+                will override default k-point meshes for uniform calculations.
+            \*\*kwargs: Other kwargs that are passed to Firework.__init__.
+        """
+        input_set_overrides = input_set_overrides or {}
+
+        fw_name = "{}-{} {}".format(
+            structure.composition.reduced_formula if structure else "unknown",
+            name,
+            mode,
+        )
+        t = []
+
+        copy_files = ["CHGCAR"]
+        if additional_files:
+            for file in additional_files:
+                copy_files.append(file)
+
+        if prev_calc_dir:
+            t.append(
+                CopyVaspOutputs(calc_dir=prev_calc_dir, additional_files=copy_files, filesystem=filesystem,
+                                port=port,  contcar_to_poscar=True)
+            )
+        elif parents:
+            t.append(CopyVaspOutputs(calc_loc=True, additional_files=copy_files))
+        else:
+            raise ValueError("Must specify previous calculation for NonSCFFW")
+
+        mode = mode.lower()
+        if mode == "uniform":
+            t.append(
+                WriteVaspNSCFFromPrev(
+                    prev_calc_dir=".", mode="uniform", **input_set_overrides
+                )
+            )
+        else:
+            t.append(
+                WriteVaspNSCFFromPrev(
+                    prev_calc_dir=".", mode="line", **input_set_overrides
+                )
+            )
+
+        t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"))
+        t.append(PassCalcLocs(name=name))
+        t.append(
+            VaspToDb(
+                db_file=db_file,
+                additional_fields={"task_label": name + " " + mode},
+                parse_dos=(mode == "uniform"),
+                bandstructure_mode=mode,
+            )
+        )
+
+        super(NonSCFFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
