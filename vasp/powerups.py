@@ -60,7 +60,7 @@ def scp_files(
 def bash_scp_files(
         original_wf,
         dest,
-        port=12346,
+        port=12350,
         fw_name_constraint=None,
         task_name_constraint="VaspToDb",
 ):
@@ -88,7 +88,7 @@ def bash_scp_files(
         fw_name_constraint=fw_name_constraint,
         task_name_constraint=task_name_constraint,
     )
-    user = "jengyuantsai" if port==12346 else "qimin"
+    user = "tsai"
     for idx_fw, idx_t in idx_list:
         original_wf.fws[idx_fw].tasks.insert(idx_t + 1, FileSCPTask(
             port=port,
