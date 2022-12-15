@@ -355,9 +355,7 @@ def add_2d_nscf_kpoints_from_vaspkit(
     Returns:
        Workflow
     """
-    vaspkit_cmd = vaspkit_cmd or {
-        "vaspkit_cmd": ">>vaspkit_cmd<<"
-    }
+    vaspkit_cmd = vaspkit_cmd or "302"
 
     idx_list = get_fws_and_tasks(
         original_wf,
