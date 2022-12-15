@@ -492,6 +492,19 @@ class Write2dNSCFKpoints(FiretaskBase):
             labels=labels,
         ).write_file("KPOINTS")
 
+@explicit_serialize
+class Write2DdSCFKpointsFromVaspkit(FiretaskBase):
+    optional_params = ["vaspkit_cmd"]
+    def run_task(self, fw_spec):
+        vaspkit_cmd = self.get("vaspkit_cmd", "302")
+        try:
+            structure = Structure.from_file("POSCAR")
+        except Exception:
+            structure = Structure.from_file("POSCAR.gz")
+
+        structure.to(fmt="poscar", filename="POSCAR")
+        subprocess.call(f"vaspkit -task {vaspkit_cmd}".split(" "))
+        Kpoints.from_file("KPATH.in").write_file("KPOINTS")
 
 @explicit_serialize
 class WriteVaspHSEBSFromPrev(FiretaskBase):

@@ -1,4 +1,7 @@
-from .firetasks.firetasks import Write2dNSCFKpoints, FileTransferTask, WriteInputsFromDB, FileSCPTask, CopyFileSCPTask
+from .firetasks.firetasks import Write2dNSCFKpoints, Write2DdSCFKpointsFromVaspkit, FileTransferTask, \
+    WriteInputsFromDB, FileSCPTask, \
+    CopyFileSCPTask
+
 from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
     VDW_KERNEL_DIR
@@ -335,6 +338,39 @@ def add_modify_2d_nscf_kpoints(
             Write2dNSCFKpoints(is_hse=is_hse, **modify_kpoints_params)
         )
     return original_wf
+
+def add_2d_nscf_kpoints_from_vaspkit(
+        original_wf, vaspkit_cmd=None, fw_name_constraint=None
+):
+    """
+    Using vaspkit to generate 2D kpoints for nscf calculation. Notice that HSE is not supported, because it needs
+    uniform kpoints.
+
+    Args:
+        original_wf (Workflow)
+        vaspkit_cmd (str): vaspkit command. Eg. vaspkit -task 302
+        fw_name_constraint (str): Only apply changes to FWs where fw_name
+        contains this substring.
+
+    Returns:
+       Workflow
+    """
+    vaspkit_cmd = vaspkit_cmd or {
+        "vaspkit_cmd": ">>vaspkit_cmd<<"
+    }
+
+    idx_list = get_fws_and_tasks(
+        original_wf,
+        fw_name_constraint=fw_name_constraint,
+        task_name_constraint="RunVasp",
+    )
+    for idx_fw, idx_t in idx_list:
+        original_wf.fws[idx_fw].tasks.insert(
+            idx_t,
+            Write2DdSCFKpointsFromVaspkit(vaspkit_cmd=vaspkit_cmd)
+        )
+    return original_wf
+
 
 def add_additional_fields_to_taskdocs(
         original_wf, update_dict=None, fw_name_constraint=None, task_name_constraint="VaspToDb"):
