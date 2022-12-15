@@ -493,7 +493,7 @@ class Write2dNSCFKpoints(FiretaskBase):
         ).write_file("KPOINTS")
 
 @explicit_serialize
-class Write2DdSCFKpointsFromVaspkit(FiretaskBase):
+class Write2dSCFKpointsFromVaspkit(FiretaskBase):
     optional_params = ["vaspkit_cmd"]
     def run_task(self, fw_spec):
         vaspkit_cmd = self.get("vaspkit_cmd", "302")

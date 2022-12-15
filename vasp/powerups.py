@@ -1,4 +1,4 @@
-from .firetasks.firetasks import Write2dNSCFKpoints, Write2DdSCFKpointsFromVaspkit, FileTransferTask, \
+from .firetasks.firetasks import Write2dNSCFKpoints, Write2dSCFKpointsFromVaspkit, FileTransferTask, \
     WriteInputsFromDB, FileSCPTask, \
     CopyFileSCPTask
 
@@ -367,7 +367,7 @@ def add_2d_nscf_kpoints_from_vaspkit(
     for idx_fw, idx_t in idx_list:
         original_wf.fws[idx_fw].tasks.insert(
             idx_t,
-            Write2DdSCFKpointsFromVaspkit(vaspkit_cmd=vaspkit_cmd)
+            Write2dSCFKpointsFromVaspkit(vaspkit_cmd=vaspkit_cmd)
         )
     return original_wf
 
