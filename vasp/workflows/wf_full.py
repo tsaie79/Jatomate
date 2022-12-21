@@ -14,7 +14,7 @@ from fireworks import Workflow
 import numpy as np
 
 def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, task,
-                    vasptodb=None, wf_addition_name=None, task_arg=None):
+                    vasptodb=None, wf_addition_name=None, task_arg=None, double_relax_ediffg=-0.01):
 
     encut = 1.3*max([potcar.enmax for potcar in MPHSERelaxSet(structure).potcar])
 
@@ -81,7 +81,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
             name="PBE_relax",
             max_force_threshold=False,
             job_type="double_relaxation_run",
-            ediffg=-0.01,
+            ediffg=double_relax_ediffg,
             force_gamma=gamma_mesh,
             vasptodb_kwargs={
                 "parse_dos": False,
