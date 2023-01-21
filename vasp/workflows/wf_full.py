@@ -280,7 +280,7 @@ def get_wf_full_hse(structure, charge_states, gamma_only, gamma_mesh, nupdowns, 
 
 
 def get_wf_full_scan(structure, charge_states, gamma_only, dos, nupdowns,
-                     vasptodb=None, wf_addition_name=None, wf_yaml=None):
+                     vasptodb=None, wf_addition_name=None, wf_yaml=None, update_fws_params=None):
 
     encut = 1.3*max([potcar.enmax for potcar in MPScanRelaxSet(structure).potcar])
     print("SET ENCUT:{}".format(encut))
@@ -338,9 +338,10 @@ def get_wf_full_scan(structure, charge_states, gamma_only, dos, nupdowns,
         }
 
         wf_yaml = wf_yaml if wf_yaml else os.path.join(os.path.dirname(os.path.abspath(__file__)), "general/scan.yaml")
-        wf = get_wf(structure, wf_yaml)
+        wf = get_wf(structure, wf_yaml, params=update_fws_params)
         if dos:
-            wf = add_modify_incar(wf, {"incar_update": {"EMAX": 10, "EMIN": -10, "NEDOS": 9000}}, fw_name_constraint="SCAN_scf")
+            wf = add_modify_incar(wf, {"incar_update": {"EMAX": 10, "EMIN": -10, "NEDOS": 9000}},
+                                  fw_name_constraint="SCAN_scf")
         if uis.get("user_incar_settings"):
             wf = add_modify_incar(wf, {"incar_update": uis["user_incar_settings"]})
         if uis.get("user_kpoints_settings"):
