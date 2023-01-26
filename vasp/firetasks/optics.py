@@ -51,23 +51,7 @@ class WriteMVLGWFromPrev(FiretaskBase):
     ]
 
     def run_task(self, fw_spec):
-
         other_params = self.get("other_params", {})
-        user_incar_settings = other_params.get("user_incar_settings", {})
-
-        if "user_incar_settings" not in other_params:
-            other_params["user_incar_settings"] = {}
-
-        # updates = {
-        #     # "ADDGRID": True,
-        #     # "LASPH": True,
-        #     # "LDAU": False,
-        #     # "LMIXTAU": True,
-        #     # "METAGGA": "SCAN",
-        #     # "NELM": 200,
-        # }
-        # other_params["user_incar_settings"].update(updates)
-        print(self.get("nbands"), self.get("nbands_factor"), self.get("ncores"))
         vis = MVLGWSet.from_prev_calc(
             prev_calc_dir=self.get("prev_calc_dir", "."),
             prev_incar=self.get("prev_incar", None),
