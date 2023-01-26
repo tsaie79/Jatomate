@@ -125,65 +125,6 @@ class WriteScanVaspStaticFromPrev(FiretaskBase):
 
 
 @explicit_serialize
-class WriteMVLGWFromPrev(FiretaskBase):
-    """
-    Writes input files for a static run. Assumes that output files from a
-    previous (e.g., optimization) run can be accessed in current dir or
-    prev_calc_dir. Also allows lepsilon (dielectric constant) calcs.
-
-    Optional params:
-        potcar_spec (bool): Instead of writing the POTCAR, write a
-            "POTCAR.spec". This is intended to allow testing of workflows
-            without requiring pseudo-potentials to be installed on the system.
-        (documentation for all other optional params can be found in
-        MPStaticSet)
-
-    """
-
-    optional_params = [
-        "prev_calc_dir",
-        "prev_incar",
-        "nbands",
-        "reciprocal_density",
-        "mode",
-        "nbands_factor",
-        "ncores",
-        "other_params"
-    ]
-
-    def run_task(self, fw_spec):
-
-        other_params = self.get("other_params", {})
-        user_incar_settings = other_params.get("user_incar_settings", {})
-
-        if "user_incar_settings" not in other_params:
-            other_params["user_incar_settings"] = {}
-
-        # updates = {
-        #     # "ADDGRID": True,
-        #     # "LASPH": True,
-        #     # "LDAU": False,
-        #     # "LMIXTAU": True,
-        #     # "METAGGA": "SCAN",
-        #     # "NELM": 200,
-        # }
-        # other_params["user_incar_settings"].update(updates)
-        print(self.get("nbands"), self.get("nbands_factor"), self.get("ncores"))
-        vis = MVLGWSet.from_prev_calc(
-            prev_calc_dir=self.get("prev_calc_dir", "."),
-            prev_incar=self.get("prev_incar", None),
-            nbands=self.get("nbands", None),
-            reciprocal_density=self.get("reciprocal_density", 100),
-            mode=self.get("mode", "DIAG"),
-            copy_wavecar=False,
-            nbands_factor=self.get("nbands_factor", 5),
-            ncores=self.get("ncores", 16),
-            **other_params
-        )
-
-        vis.write_input(".")
-
-@explicit_serialize
 class FileTransferTask(FiretaskBase):
     """
     A Firetask to Transfer files.
