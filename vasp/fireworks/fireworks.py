@@ -204,7 +204,6 @@ class JMVLGWFW(Firework):
             db_file=DB_FILE,
             vasptodb_kwargs=None,
             parents=None,
-            copy_chgcar=False,
             **kwargs
     ):
         """
@@ -244,19 +243,13 @@ class JMVLGWFW(Firework):
 
         if mode == "DIAG":
             additional_file.append("WAVECAR")
-            if copy_chgcar:
-                additional_file.append("CHGCAR")
         elif mode == "GW":
             additional_file.append("WAVECAR")
             additional_file.append("WAVEDER")
-            if copy_chgcar:
-                additional_file.append("CHGCAR")
         elif mode == "BSE":
             additional_file.append("WAVECAR")
             additional_file.append("WAVEDER")
             additional_file.append("WFULL")
-            if copy_chgcar:
-                additional_file.append("CHGCAR")
 
 
         if prev_calc_dir:
