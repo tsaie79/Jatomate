@@ -1003,7 +1003,7 @@ class JSOCFW(Firework):
         prev_calc_dir=None,
         vasp_cmd=">>vasp_ncl<<",
         copy_vasp_outputs=True,
-        db_file=None,
+        db_file=DB_FILE,
         parents=None,
         vasp_input_set_params=None,
         **kwargs
@@ -1028,7 +1028,6 @@ class JSOCFW(Firework):
         )
 
         vasp_input_set_params = vasp_input_set_params or {}
-        print(vasp_input_set_params)
 
         t = []
         if prev_calc_dir:
