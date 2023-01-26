@@ -253,7 +253,7 @@ class JMVLGWFW(Firework):
 
 
         if prev_calc_dir:
-            # t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True, additional_files=additional_file))
+            t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True, additional_files=additional_file))
             t.append(WriteMVLGWFromPrev(nbands=nbands, reciprocal_density=reciprocal_density,
                                          nbands_factor=nbands_factor, ncores=ncores, prev_incar=prev_incar,
                                          mode=mode, other_params=vasp_input_set_params))
