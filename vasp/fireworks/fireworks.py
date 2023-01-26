@@ -194,7 +194,7 @@ class JMVLGWFW(Firework):
             nbands=None,
             reciprocal_density=100,
             nbands_factor=5,
-            ncores=None,
+            ncores=16,
 
             vasp_input_set=None,
             vasp_input_set_params=None,

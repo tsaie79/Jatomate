@@ -58,7 +58,7 @@ class WriteMVLGWFromPrev(FiretaskBase):
             nbands=self.get("nbands", None),
             reciprocal_density=self.get("reciprocal_density", 100),
             mode=self.get("mode", "DIAG"),
-            copy_wavecar=False,
+            copy_wavecar=True,
             nbands_factor=self.get("nbands_factor", 5),
             ncores=self.get("ncores", 16),
             **other_params
