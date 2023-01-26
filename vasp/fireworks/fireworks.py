@@ -991,3 +991,78 @@ class NonSCFFW(Firework):
         )
 
         super(NonSCFFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
+
+
+class JSOCFW(Firework):
+    def __init__(
+        self,
+        magmom,
+        structure=None,
+        name="spin-orbit coupling",
+        saxis=(0, 0, 1),
+        prev_calc_dir=None,
+        vasp_cmd=">>vasp_ncl<<",
+        copy_vasp_outputs=True,
+        db_file=None,
+        parents=None,
+        vasp_input_set_params=None,
+        **kwargs
+    ):
+        """
+        Firework for spin orbit coupling calculation.
+        Args:
+            structure (Structure): Input structure. If copy_vasp_outputs, used only to set the
+                name of the FW.
+            name (str): Name for the Firework.
+            prev_calc_dir (str): Path to a previous calculation to copy from
+            vasp_cmd (str): Command to run vasp.
+            copy_vasp_outputs (bool): Whether to copy outputs from previous
+                run. Defaults to True.
+            db_file (str): Path to file specifying db credentials.
+            parents (Firework): Parents of this particular Firework.
+                FW or list of FWS.
+            \*\*kwargs: Other kwargs that are passed to Firework.__init__.
+        """
+        fw_name = "{}-{}".format(
+            structure.composition.reduced_formula if structure else "unknown", name
+        )
+
+        vasp_input_set_params = vasp_input_set_params or {}
+
+        t = []
+        if prev_calc_dir:
+            t.append(
+                CopyVaspOutputs(
+                    calc_dir=prev_calc_dir,
+                    additional_files=["CHGCAR"],
+                    contcar_to_poscar=True,
+                )
+            )
+            t.append(
+                WriteVaspSOCFromPrev(prev_calc_dir=".", magmom=magmom, saxis=saxis, **vasp_input_set_params)
+            )
+        elif parents and copy_vasp_outputs:
+            t.append(
+                CopyVaspOutputs(
+                    calc_loc=True, additional_files=["CHGCAR"], contcar_to_poscar=True
+                )
+            )
+            t.append(
+                WriteVaspSOCFromPrev(prev_calc_dir=".", magmom=magmom, saxis=saxis, **vasp_input_set_params)
+            )
+        elif structure:
+            vasp_input_set = MPSOCSet(structure)
+            t.append(
+                WriteVaspFromIOSet(structure=structure, vasp_input_set=vasp_input_set)
+            )
+        else:
+            raise ValueError("Must specify structure or previous calculation.")
+
+        t.extend(
+            [
+                RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"),
+                PassCalcLocs(name=name),
+                VaspToDb(db_file=db_file, additional_fields={"task_label": name}),
+            ]
+        )
+        super(JSOCFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
