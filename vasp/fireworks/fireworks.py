@@ -189,7 +189,7 @@ class JMVLGWFW(Firework):
             structure,
             mode,
             name="GW",
-
+            copy_chargcar=False,
             prev_incar=None,
             nbands=None,
             reciprocal_density=100,
@@ -243,6 +243,8 @@ class JMVLGWFW(Firework):
 
         if mode == "DIAG":
             additional_file.append("WAVECAR")
+            if copy_chargcar:
+                additional_file.append("CHGCAR")
         elif mode == "GW":
             additional_file.append("WAVECAR")
             additional_file.append("WAVEDER")
