@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="my_atomate",
+    name="atomate-tsai",
     author="Jeng-Yuan Tsai",
     version="0.1.0",
+    email="tsaie79@gmail.com",
     packages=find_packages(),
     install_requires=[
         "smoqe@git+https://github.com/dangunter/smoqe.git@master#egg=smoqe"
