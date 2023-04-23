@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="my_atomate_jyt",
+    name="my_atomate",
     author="Jeng-Yuan Tsai",
     version="0.1.0",
     packages=find_packages(),
