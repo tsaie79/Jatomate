@@ -1,14 +1,13 @@
-from my_atomate.firetasks.firetasks import WriteTwoDBSKpoints
+from .firetasks.firetasks import Write2dNSCFKpoints, Write2dSCFKpointsFromVaspkit, FileTransferTask, \
+    WriteInputsFromDB, FileSCPTask, \
+    CopyFileSCPTask
 
 from atomate.utils.utils import get_fws_and_tasks
 from atomate.vasp.config import (
-    GAMMA_VASP_CMD,
     VDW_KERNEL_DIR
 )
-
-from atomate.vasp.firetasks.jcustom import JFileTransferTask, JWriteInputsFromDB
-from atomate.vasp.firetasks.glue_tasks import CheckBandgap, CopyFiles
-from atomate.vasp.firetasks.write_inputs import ModifyIncar, ModifyKpoints, WriteVaspFromPMGObjects
+from atomate.vasp.firetasks.glue_tasks import CopyFiles
+from atomate.vasp.firetasks.write_inputs import ModifyIncar, WriteVaspFromPMGObjects
 
 from pymatgen import Structure
 from pymatgen.io.vasp.sets import MPRelaxSet
@@ -20,11 +19,19 @@ __email__ = "tsaie79@gmail.com"
 def scp_files(
         original_wf,
         dest,
+        port=12346,
         fw_name_constraint=None,
         task_name_constraint="VaspToDb",
 ):
     """
     SCP ALL files to local computer
+
+    Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
+    then, it must already have successful scp from login to local computer, i.e.
+    in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
+    db0 port = 12346
+    db1 port = 12348
 
     Args:
         original_wf (Workflow)
@@ -40,13 +47,97 @@ def scp_files(
         fw_name_constraint=fw_name_constraint,
         task_name_constraint=task_name_constraint,
     )
+    user = "jengyuantsai" if port==12346 else "qimin"
     for idx_fw, idx_t in idx_list:
-        original_wf.fws[idx_fw].tasks.insert(idx_t + 1, JFileTransferTask(
+        original_wf.fws[idx_fw].tasks.insert(idx_t + 1, FileTransferTask(
             mode="rtransfer",
             files=["all"],
             dest=dest,
             server="localhost",
-            user="jengyuantsai"
+            user=user,
+            port=port
+        ))
+
+    return original_wf
+
+def bash_scp_files(
+        original_wf,
+        dest,
+        port=12350,
+        fw_name_constraint=None,
+        task_name_constraint="VaspToDb",
+):
+    """
+    SCP ALL files to local computer
+
+    Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
+    then, it must already have successful scp from login to local computer, i.e.
+    in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
+    db0 port = 12346
+    db1 port = 12348
+
+    Args:
+        original_wf (Workflow)
+        dest (str): "/home/jengyuantsai/test_scp_fw/defect_db/binary_vac_AB/" (make sure every folder exists)
+        fw_name_constraint (str): pattern for fireworks to clean up files after
+        task_name_constraint (str): pattern for firetask to clean up files
+
+    Returns:
+       Workflow
+    """
+    idx_list = get_fws_and_tasks(
+        original_wf,
+        fw_name_constraint=fw_name_constraint,
+        task_name_constraint=task_name_constraint,
+    )
+    user = "tsai"
+    for idx_fw, idx_t in idx_list:
+        original_wf.fws[idx_fw].tasks.insert(idx_t + 1, FileSCPTask(
+            port=port,
+            user=user,
+            dest=dest,
+        ))
+
+    return original_wf
+
+def bash_scp_copy_files(
+        original_wf,
+        copy_from,
+        port=12346,
+        fw_name_constraint=None,
+        task_name_constraint="VaspToDb",
+):
+    """
+    SCP ALL files to local computer
+
+    Before using, cp login/.ssh/id_rsa.pub to local/.ssh/authorized_keys
+    then, it must already have successful scp from login to local computer, i.e.
+    in OWLS: scp -P 12346 any_file jengyuantsai@localhost:any_path
+
+    db0 port = 12346
+    db1 port = 12348
+
+    Args:
+        original_wf (Workflow)
+        dest (str): "/home/jengyuantsai/test_scp_fw/defect_db/binary_vac_AB/" (make sure every folder exists)
+        fw_name_constraint (str): pattern for fireworks to clean up files after
+        task_name_constraint (str): pattern for firetask to clean up files
+
+    Returns:
+       Workflow
+    """
+    idx_list = get_fws_and_tasks(
+        original_wf,
+        fw_name_constraint=fw_name_constraint,
+        task_name_constraint=task_name_constraint,
+    )
+    user = "tsai"
+    for idx_fw, idx_t in idx_list:
+        original_wf.fws[idx_fw].tasks.insert(idx_t + 1, CopyFileSCPTask(
+            port=port,
+            user=user,
+            copy_from=copy_from,
         ))
 
     return original_wf
@@ -59,7 +150,7 @@ def write_inputs_from_db(original_wf, db_file, task_id, modify_incar, write_chgc
         task_name_constraint="RunVasp",
     )
     for idx_fw, idx_t in idx_list:
-        original_wf.fws[idx_fw].tasks.insert(idx_t - 1, JWriteInputsFromDB(db_file=db_file, task_id=task_id,
+        original_wf.fws[idx_fw].tasks.insert(idx_t - 1, WriteInputsFromDB(db_file=db_file, task_id=task_id,
                                                                            write_chgcar=write_chgcar,
                                                                            modify_incar=modify_incar))
     return original_wf
@@ -215,8 +306,8 @@ def cp_vasp_from_prev(original_wf, vasp_io, fw_name_constraint=None):
             original_wf.fws[idx_fw].tasks[idx_t].update({"additional_files": vasp_io})
     return original_wf
 
-def add_modify_twod_bs_kpoints(
-        original_wf, modify_kpoints_params=None, fw_name_constraint=None
+def add_modify_2d_nscf_kpoints(
+        original_wf, is_hse=False, modify_kpoints_params=None, fw_name_constraint=None
 ):
     """
     Every FireWork that runs VASP has a ModifyKpoints task just beforehand. For
@@ -244,6 +335,57 @@ def add_modify_twod_bs_kpoints(
     for idx_fw, idx_t in idx_list:
         original_wf.fws[idx_fw].tasks.insert(
             idx_t,
-            WriteTwoDBSKpoints(**modify_kpoints_params)
+            Write2dNSCFKpoints(is_hse=is_hse, **modify_kpoints_params)
         )
+    return original_wf
+
+def add_2d_nscf_kpoints_from_vaspkit(
+        original_wf, vaspkit_cmd=None, fw_name_constraint=None
+):
+    """
+    Using vaspkit to generate 2D kpoints for nscf calculation. Notice that HSE is not supported, because it needs
+    uniform kpoints.
+
+    Args:
+        original_wf (Workflow)
+        vaspkit_cmd (str): vaspkit command. Eg. vaspkit -task 302
+        fw_name_constraint (str): Only apply changes to FWs where fw_name
+        contains this substring.
+
+    Returns:
+       Workflow
+    """
+    vaspkit_cmd = vaspkit_cmd or "302"
+
+    idx_list = get_fws_and_tasks(
+        original_wf,
+        fw_name_constraint=fw_name_constraint,
+        task_name_constraint="RunVasp",
+    )
+    for idx_fw, idx_t in idx_list:
+        original_wf.fws[idx_fw].tasks.insert(
+            idx_t,
+            Write2dSCFKpointsFromVaspkit(vaspkit_cmd=vaspkit_cmd)
+        )
+    return original_wf
+
+
+def add_additional_fields_to_taskdocs(
+        original_wf, update_dict=None, fw_name_constraint=None, task_name_constraint="VaspToDb"):
+    """
+    For all VaspToDbTasks in a given workflow, add information  to
+    "additional_fields" to be placed in the task doc.
+
+    Args:
+        original_wf (Workflow)
+        update_dict (Dict): dictionary to add additional_fields
+        task_name_constraint (str): name of the Firetasks to be modified.
+
+    Returns:
+       Workflow
+    """
+    idx_list = get_fws_and_tasks(original_wf, task_name_constraint=task_name_constraint,
+                                 fw_name_constraint=fw_name_constraint)
+    for idx_fw, idx_t in idx_list:
+        original_wf.fws[idx_fw].tasks[idx_t]["additional_fields"].update(update_dict)
     return original_wf

@@ -6,6 +6,7 @@ Firetasks for FWs.
 import shutil
 import json
 import os
+from pydash.objects import has, get
 import numpy as np
 
 from monty.json import MontyEncoder, jsanitize
@@ -213,7 +214,7 @@ class IRVSPToDb(FiretaskBase):
     """
 
     required_params = ["irvsp_out"]
-    optional_params = ["db_file", "additional_fields", "collection_name"]
+    optional_params = ["db_file", "additional_fields", "collection_name", "fw_spec_field", "task_fields_to_push"]
 
     def run_task(self, fw_spec):
         irvsp = self.get("irvsp_out") or fw_spec["irvsp_out"]
@@ -229,6 +230,16 @@ class IRVSPToDb(FiretaskBase):
         d["dir_name"] = os.getcwd()
         d["post_relax_sg_name"] = fw_spec["post_relax_sg_name"],
         d["post_relax_sg_number"] = fw_spec["post_relax_sg_number"]
+
+        # Check for additional keys to set based on the fw_spec
+        if self.get("fw_spec_field") and isinstance(self.get("fw_spec_field"), list):
+            for key in self.get("fw_spec_field"):
+                d.update({key: fw_spec[key]})
+        # Automatically add prev fws information
+        for prev_info_key in ["prev_fw_taskid", "prev_fw_db", "prev_fw_collection"]:
+            if prev_info_key in fw_spec:
+                d.update({prev_info_key: fw_spec[prev_info_key]})
+
         # store the results
         db_file = env_chk(self.get("db_file", ">>db_file<<"), fw_spec)
         if not db_file:
@@ -237,7 +248,32 @@ class IRVSPToDb(FiretaskBase):
         else:
             db = VaspCalcDb.from_db_file(db_file, admin=True)
             db.collection = db.db[self.get("collection_name", db.collection.name)]
+            d.update({"db": db.db_name, "collection": db.collection.name})
             t_id = db.insert(d)
             logger.info("IRVSP calculation complete.")
-        return FWAction()
+
+        task_fields_to_push = self.get("task_fields_to_push", {}) or {}
+        # pass entry information
+        task_fields_to_push.update(
+            {
+                "prev_fw_taskid": "task_id",
+                "prev_fw_db": "db",
+                "prev_fw_collection": "collection"
+            }
+        )
+        update_spec = {}
+        if task_fields_to_push:
+            if isinstance(task_fields_to_push, dict):
+                for key, path_in_task_doc in task_fields_to_push.items():
+                    if has(d, path_in_task_doc):
+                        update_spec[key] = get(d, path_in_task_doc)
+                    else:
+                        logger.warning("Could not find {} in task document. Unable to push to next firetask/firework".format(path_in_task_doc))
+            else:
+                raise RuntimeError("Inappropriate type {} for task_fields_to_push. It must be a "
+                                   "dictionary of format: {key: path} where key refers to a field "
+                                   "in the spec and path is a full mongo-style path to a "
+                                   "field in the task document".format(type(task_fields_to_push)))
+
+        return FWAction(stored_data={"task_id": d.get("task_id", None)}, update_spec=update_spec)
 

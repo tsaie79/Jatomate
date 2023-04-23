@@ -20,21 +20,21 @@ from atomate.vasp.config import (
     RELAX_MAX_FORCE,
 )
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
-from atomate.vasp.firetasks.parse_outputs import VaspToDb
 from atomate.vasp.firetasks.run_calc import (
     RunVaspCustodian,
 )
 from atomate.vasp.firetasks.write_inputs import (
     WriteVaspFromIOSet,
     WriteVaspFromPMGObjects,
-    WriteVaspSOCFromPrev,
     WriteVaspStaticFromPrev,
-    ModifyIncar
+    WriteVaspSOCFromPrev,
+    ModifyIncar,
+    WriteVaspNSCFFromPrev
 )
-from atomate.vasp.firetasks.jcustom import *
 from atomate.vasp.config import VASP_CMD, DB_FILE
 
-from my_atomate.firetasks.firetasks import WriteVaspHSEBSFromPrev
+from ..firetasks.firetasks import *
+from ..firetasks.optics import *
 
 class JOptimizeFW(Firework):
     def __init__(
@@ -189,12 +189,12 @@ class JMVLGWFW(Firework):
             structure,
             mode,
             name="GW",
-
+            copy_chargcar=False,
             prev_incar=None,
             nbands=None,
             reciprocal_density=100,
             nbands_factor=5,
-            ncores=None,
+            ncores=16,
 
             vasp_input_set=None,
             vasp_input_set_params=None,
@@ -243,6 +243,8 @@ class JMVLGWFW(Firework):
 
         if mode == "DIAG":
             additional_file.append("WAVECAR")
+            if copy_chargcar:
+                additional_file.append("CHGCAR")
         elif mode == "GW":
             additional_file.append("WAVECAR")
             additional_file.append("WAVEDER")
@@ -254,7 +256,7 @@ class JMVLGWFW(Firework):
 
         if prev_calc_dir:
             t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True, additional_files=additional_file))
-            t.append(JWriteMVLGWFromPrev(nbands=nbands, reciprocal_density=reciprocal_density,
+            t.append(WriteMVLGWFromPrev(nbands=nbands, reciprocal_density=reciprocal_density,
                                          nbands_factor=nbands_factor, ncores=ncores, prev_incar=prev_incar,
                                          mode=mode, other_params=vasp_input_set_params))
         elif parents:
@@ -262,7 +264,7 @@ class JMVLGWFW(Firework):
                 t.append(
                     CopyVaspOutputs(calc_loc=prev_calc_loc, contcar_to_poscar=True, additional_files=additional_file)
                 )
-            t.append(JWriteMVLGWFromPrev(nbands=nbands, reciprocal_density=reciprocal_density,
+            t.append(WriteMVLGWFromPrev(nbands=nbands, reciprocal_density=reciprocal_density,
                                          nbands_factor=nbands_factor, ncores=ncores, prev_incar=prev_incar,
                                          mode=mode, other_params=vasp_input_set_params))
         elif structure:
@@ -277,11 +279,11 @@ class JMVLGWFW(Firework):
 
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<", handler_group="no_handler"))
         t.append(PassCalcLocs(name=name))
-        # t.append(VaspToDb(db_file=db_file, defuse_unsuccessful=True, **vasptodb_kwargs))
+        t.append(VaspToDb(db_file=db_file, defuse_unsuccessful="fizzle", **vasptodb_kwargs))
         super(JMVLGWFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
 
 
-class JScanOptimizeFW(Firework):
+class ScanRelaxFW(Firework):
     def __init__(
             self,
             structure,
@@ -358,7 +360,7 @@ class JScanOptimizeFW(Firework):
 
         t.append(PassCalcLocs(name=name))
         t.append(VaspToDb(db_file=db_file, **vasptodb_kwargs))
-        super(JScanOptimizeFW, self).__init__(
+        super(ScanRelaxFW, self).__init__(
             t,
             parents=parents,
             name=fw_name,
@@ -366,7 +368,7 @@ class JScanOptimizeFW(Firework):
         )
 
 
-class JScanStaticFW(Firework):
+class ScanStaticFW(Firework):
     def __init__(
             self,
             structure=None,
@@ -417,11 +419,11 @@ class JScanStaticFW(Firework):
 
         if prev_calc_dir:
             t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, contcar_to_poscar=True))
-            t.append(JWriteScanVaspStaticFromPrev(other_params=vasp_input_set_params))
+            t.append(WriteScanVaspStaticFromPrev(other_params=vasp_input_set_params))
         elif parents:
             if prev_calc_loc:
                 t.append(CopyVaspOutputs(calc_loc=prev_calc_loc, contcar_to_poscar=True))
-            t.append(JWriteScanVaspStaticFromPrev(other_params=vasp_input_set_params))
+            t.append(WriteScanVaspStaticFromPrev(other_params=vasp_input_set_params))
         elif structure:
             vasp_input_set = vasp_input_set or "MPScanStaticSet"
             t.append(
@@ -432,9 +434,9 @@ class JScanStaticFW(Firework):
 
         t.append(RmSelectiveDynPoscar())
 
-        # magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
-        # if magmom:
-        #     t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
+        magmom = MPRelaxSet(structure).incar.get("MAGMOM", None)
+        if magmom:
+            t.append(ModifyIncar(incar_update={"MAGMOM": magmom}))
 
         t.append(ModifyIncar(incar_update={"EDIFF": 1E-5}))
 
@@ -449,7 +451,7 @@ class JScanStaticFW(Firework):
         t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"))
         t.append(PassCalcLocs(name=name))
         t.append(VaspToDb(db_file=db_file, **vasptodb_kwargs))
-        super(JScanStaticFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
+        super(ScanStaticFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
 
 
 class JHSEStaticFW(Firework):
@@ -643,7 +645,7 @@ class JHSERelaxFW(Firework):
             vasptodb_kwargs=None,
             parents=None,
             force_gamma=True,
-            job_type="normal",
+            job_type="double_relaxation_run",
             max_force_threshold=False,
             ediffg=None,
             auto_npar=">>auto_npar<<",
@@ -711,7 +713,7 @@ class JHSERelaxFW(Firework):
 
 class JHSEcDFTFW(Firework):
 
-    def __init__(self, up_occupation, down_occupation, nbands, prev_calc_dir=None, filesystem=None,
+    def __init__(self, up_occupation, down_occupation, nbands, prev_calc_dir=None, filesystem=None, port=27017,
                  structure=None, specific_structure=None,
                  name="HSE_cDFT", default_magmom=True,
                  vasp_input_set_params=None, job_type="normal", max_force_threshold=None,
@@ -728,7 +730,8 @@ class JHSEcDFTFW(Firework):
         fw_name = "{}-{}".format(structure.composition.reduced_formula if structure else "unknown", name)
 
         if prev_calc_dir:
-            t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, additional_files=["WAVECAR"], contcar_to_poscar=True, filesystem=filesystem))
+            t.append(CopyVaspOutputs(calc_dir=prev_calc_dir, additional_files=["WAVECAR"], contcar_to_poscar=True,
+                                     filesystem=filesystem, port=port))
             t.append(WriteVaspHSEBSFromPrev(mode="uniform", reciprocal_density=None, kpoints_line_density=None))
             if specific_structure:
                 t.append(WriteVaspFromPMGObjects(poscar=specific_structure))
@@ -900,3 +903,168 @@ class HSEBSFW(Firework):
         )
         super(HSEBSFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
 
+
+class NonSCFFW(Firework):
+    def __init__(
+            self,
+            parents=None,
+            prev_calc_dir=None,
+            filesystem=None,
+            port=None,
+            structure=None,
+            name="nscf",
+            mode="uniform",
+            vasp_cmd=VASP_CMD,
+            additional_files=None,
+            db_file=DB_FILE,
+            input_set_overrides=None,
+            **kwargs
+    ):
+        """
+        Standard NonSCF Calculation Firework supporting uniform and line modes.
+
+        Args:
+            structure (Structure): Input structure - used only to set the name
+                of the FW.
+            name (str): Name for the Firework.
+            mode (str): "uniform" or "line" mode.
+            vasp_cmd (str): Command to run vasp.
+            copy_vasp_outputs (bool): Whether to copy outputs from previous
+                run. Defaults to True.
+            prev_calc_dir (str): Path to a previous calculation to copy from
+            db_file (str): Path to file specifying db credentials.
+            parents (Firework): Parents of this particular Firework.
+                FW or list of FWS.
+            input_set_overrides (dict): Arguments passed to the
+                "from_prev_calc" method of the MPNonSCFSet. This parameter
+                allows a user to modify the default values of the input set.
+                For example, passing the key value pair
+                    {'reciprocal_density': 1000}
+                will override default k-point meshes for uniform calculations.
+            \*\*kwargs: Other kwargs that are passed to Firework.__init__.
+        """
+        input_set_overrides = input_set_overrides or {}
+
+        fw_name = "{}-{} {}".format(
+            structure.composition.reduced_formula if structure else "unknown",
+            name,
+            mode,
+        )
+        t = []
+
+        copy_files = ["CHGCAR"]
+        if additional_files:
+            for file in additional_files:
+                copy_files.append(file)
+
+        if prev_calc_dir:
+            t.append(
+                CopyVaspOutputs(calc_dir=prev_calc_dir, additional_files=copy_files, filesystem=filesystem,
+                                port=port,  contcar_to_poscar=True)
+            )
+        elif parents:
+            t.append(CopyVaspOutputs(calc_loc=True, additional_files=copy_files))
+        else:
+            raise ValueError("Must specify previous calculation for NonSCFFW")
+
+        mode = mode.lower()
+        if mode == "uniform":
+            t.append(
+                WriteVaspNSCFFromPrev(
+                    prev_calc_dir=".", mode="uniform", **input_set_overrides
+                )
+            )
+        else:
+            t.append(
+                WriteVaspNSCFFromPrev(
+                    prev_calc_dir=".", mode="line", **input_set_overrides
+                )
+            )
+
+        t.append(RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"))
+        t.append(PassCalcLocs(name=name))
+        t.append(
+            VaspToDb(
+                db_file=db_file,
+                additional_fields={"task_label": name + " " + mode},
+                parse_dos=(mode == "uniform"),
+                bandstructure_mode=mode,
+            )
+        )
+
+        super(NonSCFFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)
+
+
+class JSOCFW(Firework):
+    def __init__(
+        self,
+        magmom,
+        structure=None,
+        name="spin-orbit coupling",
+        saxis=(0, 0, 1),
+        prev_calc_dir=None,
+        vasp_cmd=">>vasp_ncl<<",
+        copy_vasp_outputs=True,
+        db_file=DB_FILE,
+        parents=None,
+        vasp_input_set_params=None,
+        **kwargs
+    ):
+        """
+        Firework for spin orbit coupling calculation.
+        Args:
+            structure (Structure): Input structure. If copy_vasp_outputs, used only to set the
+                name of the FW.
+            name (str): Name for the Firework.
+            prev_calc_dir (str): Path to a previous calculation to copy from
+            vasp_cmd (str): Command to run vasp.
+            copy_vasp_outputs (bool): Whether to copy outputs from previous
+                run. Defaults to True.
+            db_file (str): Path to file specifying db credentials.
+            parents (Firework): Parents of this particular Firework.
+                FW or list of FWS.
+            \*\*kwargs: Other kwargs that are passed to Firework.__init__.
+        """
+        fw_name = "{}-{}".format(
+            structure.composition.reduced_formula if structure else "unknown", name
+        )
+
+        vasp_input_set_params = vasp_input_set_params or {}
+
+        t = []
+        if prev_calc_dir:
+            t.append(
+                CopyVaspOutputs(
+                    calc_dir=prev_calc_dir,
+                    additional_files=["CHGCAR"],
+                    contcar_to_poscar=True,
+                )
+            )
+            t.append(
+                WriteVaspSOCFromPrev(prev_calc_dir=".", magmom=magmom, saxis=saxis, **vasp_input_set_params)
+            )
+        elif parents and copy_vasp_outputs:
+            t.append(
+                CopyVaspOutputs(
+                    calc_loc=True, additional_files=["CHGCAR"], contcar_to_poscar=True
+                )
+            )
+            t.append(
+                WriteVaspSOCFromPrev(prev_calc_dir=".", magmom=magmom, saxis=saxis, **vasp_input_set_params)
+            )
+        elif structure:
+            vasp_input_set = MPSOCSet(structure)
+            t.append(
+                WriteVaspFromIOSet(structure=structure, vasp_input_set=vasp_input_set)
+            )
+        else:
+            raise ValueError("Must specify structure or previous calculation.")
+
+        t.extend(
+            [
+                RunVaspCustodian(vasp_cmd=vasp_cmd, auto_npar=">>auto_npar<<"),
+                PassCalcLocs(name=name),
+                VaspToDb(db_file=db_file, additional_fields={"task_label": name}),
+            ]
+        )
+        super(JSOCFW, self).__init__(t, parents=parents, name=fw_name, **kwargs)

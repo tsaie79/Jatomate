@@ -1,0 +1,51 @@
+fireworks:
+- fw: my_atomate_jyt.vasp.fireworks.fireworks.ScanRelaxFW
+  params:
+    name: SCAN_relax
+    force_gamma: True
+    override_default_vasp_params:
+      user_incar_settings:
+        ISIF: 2
+        ISMEAR: 0
+        SIGMA: 0.01
+        EDIFFG: -0.01
+        LCHARG: False
+        LWAVE: False
+        NSW: 150
+    job_type: double_relaxation_run
+    max_force_threshold: False
+    vasptodb_kwargs:
+      additional_fields:
+        task_type: ScanRelaxFW
+      parse_dos: False
+      parse_eigenvalues: False
+      parse_chgcar: False
+
+- fw: my_atomate_jyt.vasp.fireworks.fireworks.ScanStaticFW
+  params:
+    name: SCAN_scf
+    parents: 0
+    force_gamma: True
+    vasp_input_set_params:
+      user_incar_settings:
+        LAECHG: False
+        EDIFF: 1e-05
+        ISMEAR: 0
+        LCHARG: False
+        LWAVE: True
+        SIGMA: 0.01
+    vasptodb_kwargs:
+      additional_fields:
+        task_type: ScanStaticFW
+      parse_dos: True
+      parse_eigenvalues: True
+      parse_chgcar: False
+
+- fw: my_atomate_jyt.vasp.fireworks.pytopomat.IrvspFW
+  params:
+    name: irvsp
+    parents: 1
+    kpt_mode: single_kpt
+    symprec: 0.001
+    irvsptodb_kwargs:
+      collection_name: ir_data

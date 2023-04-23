@@ -4,14 +4,14 @@ from atomate.common.firetasks.glue_tasks import PassCalcLocs
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 from atomate.vasp.config import DB_FILE
 
-from firetasks.pyzfs import RunPyzfs, PyzfsToDb
+from ..firetasks.pyzfs import RunPyzfs, PyzfsToDb
 
 class PyzfsFW(Firework):
     def __init__(
             self,
             parents=None,
             structure=None,
-            name="pytopomat",
+            name="pyzfs",
             prev_calc_dir=None,
             pyzfs_cmd=">>pyzfs_cmd<<",
             db_file=DB_FILE,

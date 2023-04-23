@@ -11,7 +11,7 @@ from atomate.vasp.config import DB_FILE
 from atomate.common.firetasks.glue_tasks import PassCalcLocs
 from atomate.vasp.firetasks.glue_tasks import CopyVaspOutputs
 
-from my_atomate.firetasks.pytopomat import (
+from ..firetasks.pytopomat import (
     RunIRVSP,
     RunIRVSPAll,
     RunIRVSPsingleKpt,
@@ -64,7 +64,7 @@ class IrvspFW(Firework):
             t.append(
                 CopyVaspOutputs(
                     calc_dir=prev_calc_dir,
-                    additional_files=["CHGCAR", "WAVECAR"],
+                    additional_files=["WAVECAR"],
                     contcar_to_poscar=True,
                 )
             )
@@ -72,7 +72,7 @@ class IrvspFW(Firework):
             t.append(
                 CopyVaspOutputs(
                     calc_loc=True,
-                    additional_files=["CHGCAR", "WAVECAR"],
+                    additional_files=["WAVECAR"],
                     contcar_to_poscar=True,
                 )
             )
