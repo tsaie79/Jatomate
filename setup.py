@@ -4,7 +4,8 @@ setup(
     name="atomate-tsai",
     author="Jeng-Yuan Tsai",
     version="0.1.0",
-    email="tsaie79@gmail.com",
+    author_email="tsaie79@gmail.com",
+    summary="Atomate fork for Tsai",
     packages=find_packages(),
     install_requires=[
         "smoqe@git+https://github.com/dangunter/smoqe.git@master#egg=smoqe"
