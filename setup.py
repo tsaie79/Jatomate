@@ -14,7 +14,7 @@ setup(
         "@51d84ea1fd034941baa22d4b1b8610a4cc6fb801#egg=pymatgen_diffusion",
         "ase@git+ssh://git@github.com/rosswhitfield/ase.git@07de35654601ddbb2b23a4e7df7091696b0af108#egg=ase",
         "pytopomat@git+https://github.com/tsaie79/pytopomat.git@38e5856eec61800a52b44ea0dfd2c99de311f97f#egg=pytopomat",
-        "pycdt@git+https://github.com/tsaie79/pycdt.git@aaa8249ed4dace846ca49299b83aa831230b70f8#egg=pycdt",
+        "pycdt@git+https://github.com/tsaie79/pycdt.git@master#egg=pycdt",
         "pymatgen@git+https://github.com/tsaie79/pymatgen.git@master#egg=pymatgen",
         "atomate@git+https://github.com/tsaie79/atomate.git@master#egg=atomate",
         "FireWorks==1.9.6",
